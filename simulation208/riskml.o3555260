@@ -1,0 +1,33 @@
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+Loading required package: Matrix
+Loading required package: foreach
+Loaded glmnet 2.0-13
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:xts':
+
+    first, last
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Warning message:
+In varlist(n.sim = list(type = "N", expr = quote(N[sim]), value = num_sims),  :
+  "grid" and "inner" variables should have length(value) > 1,
+But these do not:
+Memory
+[1] TRUE
+[1] TRUE

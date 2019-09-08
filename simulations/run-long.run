@@ -1,0 +1,18 @@
+#PBS -N riskml  
+#PBS -l nodes=1:ppn=8    
+#PBS -l mem=2GB 
+#PBS -q una-long   
+#PBS -M cgeorges@hamilton.edu 
+#PBS -m bea        
+#PBS -j oe         
+#PBS -l walltime=300:00:00
+#PBS -r y
+#
+cd $PBS_O_WORKDIR
+module load mpi/mvapich2-x86_64
+module load R/3.4.2
+#rm ../output.rds
+#rm riskmltest.o*
+
+Rscript montecarlo.r 
+
