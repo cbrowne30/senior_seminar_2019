@@ -33,3 +33,12 @@
     - If you want to look at the output file, use the `readRDS` function and give it the output file name.  To get the actual values of the simulation output, you can do `getArray(readRDS("output.rds"), "value")`.  Then you can turn that into a dataframe using the `array2df()` function. 
     
 - All other input variables to the main simulation are still in `input-lm-v1.2.r` and you don't have to worry about getting rid of the inputs that you are varying in the repeated simulation, because they just get overwritten in `main()`
+
+## Dependencies
+- zoo
+- xts
+- glmnet
+- rlist
+- dplyr
+- leaps
+- neuralnet

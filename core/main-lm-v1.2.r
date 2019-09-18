@@ -2,13 +2,15 @@
 
 #### Set up environment###
 
-# This directory will work for everyone, as long as you are running the repo
-# from inside the directory
+# Adjust this so the working directory is inside the senior_seminar_2019 folder
 setwd("~/thesis/senior_seminar_2019")
 #setwd(".")
 
 # Import functions library
-source("core/functions-lm-v1.2.R")
+source("core/functions-initialize.R")
+source("core/functions-estimation.R")
+source("core/functions-helper.R")
+
 
 # Loads all of the input parameters globally
 GetMacros(inputfile = "inputs/input-lm-v1.2.txt") # add lm
@@ -190,27 +192,6 @@ simulation_loop = function(t) {
   }
 }
 
-
-
-#################################
-### Helper functions ###
-#################################
-print_market = function(t) {
-  print(paste("ROUND", t))
-  print("---------------------------------------")
-  print("#######################################")
-  
-  print("Optimal Agent")
-  print(OptimalAgent)
-  #print(Market)
-  print(popsize)
-  printPopSize = popsize
-  if(printPopSize > 100) {
-    printPopSize = 100
-  }
-  print("MARKET:")
-  print(Market[1:printPopSize, 1:size])
-}
 
 
 
