@@ -4,14 +4,14 @@
 
 # This directory will work for everyone, as long as you are running the repo
 # from inside the directory
-setwd("~/Senior_Seminar")
+setwd("~/thesis/senior_seminar_2019")
 #setwd(".")
 
 # Import functions library
 source("core/functions-lm-v1.2.R")
 
 # Loads all of the input parameters globally
-GetMacros(inputfile = "input-lm-v1.2.txt") # add lm
+GetMacros(inputfile = "inputs/input-lm-v1.2.txt") # add lm
 
 # Commented out 2/20/18.  Will set seed in montecarlo.r
 #set.seed(randSeed) #added 7/17/17
@@ -72,7 +72,9 @@ GetMacros(inputfile = "input-lm-v1.2.txt") # add lm
 ################################################################################
 
 
-# First Stage: Initialize Prices, Market, and Storage
+###########################################################
+### First Stage: Initialize Prices, Market, and Storage ###
+###########################################################
 initializer = function(sim_rounds, num) {
   # maximum number of terms in the model is (powers * lags) + (((lags-1) * (lags)) / 2)
   # a few other data items are saved, so 3 is added to the size to make room for these values
@@ -83,7 +85,9 @@ initializer = function(sim_rounds, num) {
 }
 
 
-#Second Stage: Loop until linit without updating forecast rule parameter values
+######################################################################################
+### Second Stage: Loop until linit without updating forecast rule parameter values ###
+######################################################################################
 create_initial_data = function(t) {
   #if (t %% 100 == 0) {
    # print(paste("round:" , t), quote = FALSE)
@@ -119,12 +123,13 @@ create_initial_data = function(t) {
 }
 
 
-#Third Stage: Rest of Simulation (Bulk)
+##############################################
+### Third Stage: Rest of Simulation (Bulk) ###
+##############################################
 simulation_loop = function(t) {
   if (t < memory) {
-    print("This should definitely not be printing. You messed up.")
-  }
-  else {
+    stop("t is less than memory. This should not be possible")
+  } else {
     if (t %% 100 == 0) {
       #print(paste("round:" , t), quote = FALSE)
     }
@@ -188,7 +193,7 @@ simulation_loop = function(t) {
 
 
 #################################
-### Controller for Simulation ###
+### Helper functions ###
 #################################
 print_market = function(t) {
   print(paste("ROUND", t))
@@ -197,54 +202,54 @@ print_market = function(t) {
   
   print("Optimal Agent")
   print(OptimalAgent)
-  
+  #print(Market)
+  print(popsize)
+  printPopSize = popsize
+  if(printPopSize > 100) {
+    printPopSize = 100
+  }
   print("MARKET:")
-  print(Market[1:100, 1:size])
-  
-  
+  print(Market[1:printPopSize, 1:size])
 }
 
-# If you want to include other variables in the repeated simulation, add a parameter to this function
+
+
+#################################
+### Main function ###
+#################################
 main = function(Memory, Pupdate) {
-     # Then override the global input that we have from GetMacros with the parameter value.  
-     memory <<- Memory
-     pupdate <<- Pupdate
-     crash_t <<- 0
-     
-     #print(linit)
-     for (t in (lags + 1):rounds) {
-     	 if (t == (lags + 1)) {
-	      initializer(rounds, popsize)
-     	  }
-		
-	     else if ( (t > (lags + 1))&(t <= linit ) ) {
- 	          # Not first round and before linit round
-            # changed memory + 3 to linit 7/17/17
-	          create_initial_data(t)
-	      } 
+  # Then override the global input that we have from GetMacros with the parameter value.  
+  memory <<- Memory
+  pupdate <<- Pupdate
+  crash_t <<- 0
 
-	     else if ((prices[t-1] < bubbleThresholdLow) | (prices[t-1] > bubbleThresholdHigh)) { 
-	          # check if price has blown up
-  	        # changed ex to prices 7/17/17
-            crash_t <<- t
-	          numBubbles = numBubbles + 1
-            print("We're Experiencing a Bubble or a Crash")
-      	    break
- 	      } 
-
-	     else {
-	        simulation_loop(t)
-	     }
-       #print_market(t)
-       
-     } #close for loop
-    Make_Zoos(t)
-    #print("End of Sim")
-    return (numBubbles)
-    } 
+  for (t in (lags + 1):rounds) {
+    if (t == (lags + 1)) {
+      initializer(rounds, popsize)
+    } else if ( (t > (lags + 1))&(t <= linit ) ) {
+      # Not first round and before linit round
+      # changed memory + 3 to linit 7/17/17
+      create_initial_data(t)
+    } else if ((prices[t-1] < bubbleThresholdLow) | (prices[t-1] > bubbleThresholdHigh)) { 
+      # check if price has blown up
+      # changed ex to prices 7/17/17
+      crash_t <<- t
+      numBubbles = numBubbles + 1
+      print("We're Experiencing a Bubble or a Crash")
+      break
+    } else {
+      simulation_loop(t)
+    }
+    print_market(t)
+  }
+  
+  Make_Zoos(t)
+  #print("End of Sim")
+  return (numBubbles)
+}
 
 
 
 #THE BUTTON: pull the trigger -- execute main()
-#main(Memory = 100, Pupdate = 0.5)
+main(Memory = 100, Pupdate = 0.5)
 

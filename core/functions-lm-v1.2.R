@@ -356,15 +356,14 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
   # 4: Hybrid selection agent
   # 5: glmnet with cv (elastic net: alpha = .5) #7/30/18
   # 6: glmnet with cv (ridge: alpha = 0) #8/15/18
+  # 7: Smoothing Spline with LM
   ##########
   
   if (runType == 0) {
     # LM
-    
     # Creating dataset to run ols
     x_y = as.data.frame(cbind(Y, MATRIX))
     regression = lm(formula = Y ~ ., data = x_y)
-    
     # Retrieving regression coefficients
     test_val = (as.matrix(summary(regression)$coefficients[,1],
                       nrow = size,
@@ -372,7 +371,6 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
     
     return (test_val)
   }
-    
   else if (runType == 1) {
     # Standard glmnet lambda = 0
     # checking for equivalence with standard lm regression
@@ -384,7 +382,6 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
                  # s controls which lambda value is chosen from the list
                  s = 0))
   }
-  
   else if (runType == 2) {
     # Standard glmnet lambda = 1
     return (coef(glmnet(x = MATRIX[,2:ncol(MATRIX)],
@@ -395,7 +392,6 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
                  # s controls which lambda value is chosen from the list
                  s = .1))
   }
-
   else if (runType == 3) {
     # CV glmnet lasso
     # probably not correct yet
@@ -407,7 +403,6 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
                  # s = "lambda.min" chooses the lambda with the best cv value
                  s = "lambda.min"))
   }
-  
   else if (runType == 4) {
     HybridAgent = rep(0,size)
     # Perform the hybrid model selection regression
@@ -470,16 +465,20 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
                  s = "lambda.min"))
   }
   
-  else if (runType == 7) {  #added 6/9/19 for near lasso -- alpha = 1 - epsilon
-    # CV glmnet lasso
-    # probably not correct yet
-    return (coef(cv.glmnet(x = MATRIX[,2:ncol(MATRIX)],
-                           y = Y,
-                           alpha = 0.95,
-                           nfolds = 10,   # might need to be more dynamic
-                           family = "gaussian"),
-                 # s = "lambda.min" chooses the lambda with the best cv value
-                 s = "lambda.min"))
+  else if (runType == 7) {
+      # WORKING ON THIS CURRENLTY
+      # IGNORE FOR NOW
+      x_y = as.data.frame(cbind(Y, MATRIX))
+      print(x_y)
+      regression = lm(formula = Y ~ ., data = x_y)
+      print(regression)
+      break
+      # Retrieving regression coefficients
+      test_val = (as.matrix(summary(regression)$coefficients[,1],
+                            nrow = size,
+                            ncol = 1))
+      return (smooth.spline())
+      return (test_val)
   }
    
 }
