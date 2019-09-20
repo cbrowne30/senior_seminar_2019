@@ -11,6 +11,8 @@ source("core/functions-initialize.R")
 source("core/functions-estimation.R")
 source("core/functions-helper.R")
 
+#Dependency Check and Attach Packages
+DependencyCheck()
 
 # Loads all of the input parameters globally
 GetMacros(inputfile = "inputs/input-lm-v1.2.txt") # add lm

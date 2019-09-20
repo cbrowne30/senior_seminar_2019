@@ -15,25 +15,23 @@ rm(list = ls())
 # setwd("~/Senior_Seminar")
 setwd(".")
 
-# install.packages("zoo")
-# install.packages("xts")
-#library(zoo)
-#library(xts)
-#library(glmnet)
-#library(rlist)
-#library(dplyr)
-#library(leaps)
-#library(neuralnet)
+library(zoo)
+library(xts)
+library(glmnet)
+library(rlist)
+library(dplyr)
+library(leaps)
+library(neuralnet)
 ######################## APERITIF #########################
 
-DependecyCheck = function() {
-    require(zoo)
-    require(xts)
-    require(glmnet)
-    require(rlist)
-    require(dplyr)
-    require(leaps)
-    require(neuralnet)
+#Package/Dependency Checks and Installation
+DependencyCheck = function() {
+    dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet")
+    for (depen in dependencies) {
+        if(depen %in% rownames(installed.packages()) == FALSE){
+            install.packages(depen)
+        }
+    }
 }
 
 # Get Inputs
