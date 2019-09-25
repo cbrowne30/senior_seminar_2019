@@ -59,6 +59,7 @@ GetMacros = function(inputfile)
     
     powers <<- subset(input, Varnames == "powers")[[2]]
     lags <<- subset(input, Varnames == "lags")[[2]]
+    layers <<- subset(input, Varnames == "layers")[[2]]
     numBubbles <<- subset(input, Varnames == "numBubbles")[[2]]
     
     # initial conditions
@@ -107,14 +108,12 @@ initialize_prices = function(sim_rounds) {
 
 
 # Setup RepAgent and Market Array
-initialize_market = function(num_agents)
-    #=popsize
-{
+initialize_market = function(num_agents) {
     # RepAgent is just a vector -- he will store the mean parameters and calc.
     # market price
     RepAgent <<- rep(0, (size+2))
     RepAgent[2] <<- (dividend / interest) + dividend
-    
+
     # initialize matrix (or array) of agents
     Market <<-
         matrix(

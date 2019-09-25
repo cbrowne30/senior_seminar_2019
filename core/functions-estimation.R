@@ -7,8 +7,7 @@
 
 # Update Matrix: Takes last M prices and builds Matrix to update AR model
 # Changed Price.. to PriceDiv.. 7/17/17
-UpdateMatrix = function(PriceDivData, M, t)
-{
+UpdateMatrix = function(PriceDivData, M, t) {
     # Grab Most Recent 50 Price (and Div)
     # Chanced Price.. to PriceDiv.. 7/17/17
     if (t <= M + (lags + 1)) {
@@ -72,8 +71,7 @@ UpdateMatrix = function(PriceDivData, M, t)
 
 # Make prediction for P_t (first step of iterated forecasting,
 # USING AVERAGE PARAMS)
-Predict_t = function(matrix_data, Params, t)
-{
+Predict_t = function(matrix_data, Params, t) {
     
     # Get most recent COMPLETE row of data
     pred_inputs = matrix_data[which(index(matrix_data) == t - 1), ]
@@ -110,8 +108,7 @@ Predict_t1 = function(matrix_data, Params, t)
 
 
 # Estimate Parameters (REP AGENT)
-EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
-{ # arg1: TS of last M price(EX) obs
+EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
     # arg2: matrix of last M obs, 1-lag
     # goal is to fit AR model on M obs
     # Matrix Mult should spit out the Optimal BetaVec
@@ -269,6 +266,8 @@ EstParams = function(new_matrix, t) #=MatrixUpdate // new_matrix
                               ncol = 1))
         return (smooth.spline())
         return (test_val)
+    } else if (runType == 8) {
+        return (neuralnet("SomeName",XX[],hidden=layers,))
     }
     
 }

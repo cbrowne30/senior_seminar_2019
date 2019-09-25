@@ -3,7 +3,8 @@
 #### Set up environment###
 
 # Adjust this so the working directory is inside the senior_seminar_2019 folder
-setwd("~/thesis/senior_seminar_2019")
+#setwd("~/thesis/senior_seminar_2019")
+setwd("~/senior_seminar_2019/test")
 #setwd(".")
 
 # Import functions library
@@ -13,7 +14,7 @@ source("core/functions-helper.R")
 
 
 # Loads all of the input parameters globally
-GetMacros(inputfile = "inputs/input-lm-v1.2.txt") # add lm
+GetMacros(inputfile = "inputs/input-lm-v1.2.txt")
 
 # Commented out 2/20/18.  Will set seed in montecarlo.r
 #set.seed(randSeed) #added 7/17/17
@@ -191,8 +192,6 @@ simulation_loop = function(t) {
     UpdateFundamentals(newPrice = RepAgent[size], t)
   }
 }
-
-
 
 
 #################################
