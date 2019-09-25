@@ -231,5 +231,5 @@ main = function(Memory, Pupdate) {
 
 
 #THE BUTTON: pull the trigger -- execute main()
-main(Memory = 100, Pupdate = 0.5)
+#main(Memory = 100, Pupdate = 0.5)
 

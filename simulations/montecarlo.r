@@ -10,7 +10,7 @@
 # to specify the type of cluster you want.
 library(simsalapar)
 library(parallel)
-setwd("~/Senior_Seminar/simulations/")
+setwd("~/senior_seminar_2019/simulations/")
 
 # Get all of the main functions in, including all the global variables
 source("main-lm-v1.2.r")
@@ -22,7 +22,7 @@ pupdate_list <<- seq(0.5, 0.9, 0.2)
 
 # This value is how many runs of the simulation will occur for each combination of 
 # variable values.  I have it set to 2 for testing purposes, but you will probably want more.
-num_sims <<- 500
+num_sims <<- 2
 
 ## This creates a grid of variable combinations to run simulation on.
 # n.sim is the same as num_sims above and is necessary
