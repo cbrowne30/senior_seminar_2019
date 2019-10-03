@@ -149,13 +149,16 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
     if (runType == 0) {
         # LM
         # Creating dataset to run ols
+        
+        #print(length(matrix(Y, ncol= 1)))
+        #print(length(matrix(X, ncol=2)))
         x_y = as.data.frame(cbind(Y, MATRIX))
         regression = lm(formula = Y ~ ., data = x_y)
+
         # Retrieving regression coefficients
         test_val = (as.matrix(summary(regression)$coefficients[,1],
                               nrow = size,
                               ncol = 1))
-        
         return (test_val)
     }
     else if (runType == 1) {
@@ -267,7 +270,53 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
         return (smooth.spline())
         return (test_val)
     } else if (runType == 8) {
-        return (neuralnet("SomeName",XX[],hidden=layers,))
+        # LM
+        # Creating dataset to run ols
+        #print(nrow(MATRIX[,2:ncol(MATRIX)]))
+        #print(nrow(Y))
+        #print(nrow(MATRIX))
+        #print(as.vector(MATRIX[,2]))
+        
+        #print(as.vector(Y))
+        
+        #print(length(matrix(Y, ncol= 1)))
+        #print(length(matrix(X, ncol=2)))
+        #x_y = as.data.frame(cbind(Y, MATRIX))
+        #print(x_y)
+        #regression = lm(formula = Y ~ ., data = x_y)
+        #print(length(MATRIX[,2:ncol(MATRIX)]))
+        #print(length(Y))
+        #print(x_y)
+        #regressers = lags + 1 + lags * powers - 1 + combin(lags ) twice
+        #open mpi
+        #laags = as.vector(MATRIX[,2])
+        #priices = as.vector(Y)
+        #ss <- smooth.spline(laags,priices, df=6)
+        #print(predict(ss, x=10.52175))
+        #print(predict(ss, x=laags))
+        #plot(priices, laags, col = "grey")
+        #lines(ss, col = "purple")
+        #print(predict(ss, x=priices))
+        #print(predict(ss, y=priices))
+        #print(predict(ss, x=11, y = 10))
+        #print(MATRIX[3,2])
+
+        #print(MATRIX)
+        
+        #return (test_val)
+        
+        x_y = as.data.frame(cbind(Y, MATRIX))
+        smoothSpline <- smooth.spline(as.vector(x_y[,3]),as.vector(x_y[,1]), df=6)
+        print(x_y)
+        x_y[,1] = predict(smoothSpline, x=as.vector(x_y[,3]))$y
+        regression = lm(formula = Y ~ ., data = x_y)
+
+        # Retrieving regression coefficients
+        test_val = (as.matrix(summary(regression)$coefficients[,1],
+                              nrow = size,
+                              ncol = 1))
+
+        return (test_val)
     }
     
 }
