@@ -15,13 +15,6 @@ rm(list = ls())
 # setwd("~/Senior_Seminar")
 setwd(".")
 
-library(zoo)
-library(xts)
-library(glmnet)
-library(rlist)
-library(dplyr)
-library(leaps)
-library(neuralnet)
 ######################## APERITIF #########################
 
 #Package/Dependency Checks and Installation
@@ -31,6 +24,7 @@ DependencyCheck = function() {
         if(depen %in% rownames(installed.packages()) == FALSE){
             install.packages(depen)
         }
+        library(depen, character.only = TRUE) 
     }
 }
 

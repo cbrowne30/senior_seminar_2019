@@ -20,6 +20,10 @@ GetMacros(inputfile = "inputs/input-lm-v1.2.txt") # add lm
 # Commented out 2/20/18.  Will set seed in montecarlo.r
 #set.seed(randSeed) #added 7/17/17
 
+#Error check for more predictors than osbervations
+if (runType == 0 & (lags*powers+1 > memory)){
+  break()
+}
 
 #########################  ######################### #########################
 #
@@ -206,6 +210,7 @@ main = function(Memory, Pupdate) {
   pupdate <<- Pupdate
   crash_t <<- 0
 
+  #The round starts at lags + 1.  If linit+1 is less than memory it wont work
   for (t in (lags + 1):rounds) {
     if (t == (lags + 1)) {
       initializer(rounds, popsize)
