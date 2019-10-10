@@ -74,6 +74,8 @@ UpdateMatrix = function(PriceDivData, M, t) {
 Predict_t = function(matrix_data, Params, t) {
     
     # Get most recent COMPLETE row of data
+    print(matrix_data)
+    print(matrix_data[which(index(matrix_data) == t - 1), ])
     pred_inputs = matrix_data[which(index(matrix_data) == t - 1), ]
     
     # writeLines("\npred_inputs:")
@@ -81,6 +83,8 @@ Predict_t = function(matrix_data, Params, t) {
     
     # (1x7) x (7x1)
     x_hat_t = pred_inputs %*% (Params) # changed p to x 7/17/17
+    print(x_hat_t)
+    print("djdjdjjd")
     
     return(x_hat_t) # changed p to x 7/17/17
 }
@@ -270,46 +274,13 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
         return (smooth.spline())
         return (test_val)
     } else if (runType == 8) {
-        # LM
-        # Creating dataset to run ols
-        #print(nrow(MATRIX[,2:ncol(MATRIX)]))
-        #print(nrow(Y))
-        #print(nrow(MATRIX))
-        #print(as.vector(MATRIX[,2]))
-        
-        #print(as.vector(Y))
-        
-        #print(length(matrix(Y, ncol= 1)))
-        #print(length(matrix(X, ncol=2)))
-        #x_y = as.data.frame(cbind(Y, MATRIX))
-        #print(x_y)
-        #regression = lm(formula = Y ~ ., data = x_y)
-        #print(length(MATRIX[,2:ncol(MATRIX)]))
-        #print(length(Y))
-        #print(x_y)
-        #regressers = lags + 1 + lags * powers - 1 + combin(lags ) twice
-        #open mpi
-        #laags = as.vector(MATRIX[,2])
-        #priices = as.vector(Y)
-        #ss <- smooth.spline(laags,priices, df=6)
-        #print(predict(ss, x=10.52175))
-        #print(predict(ss, x=laags))
-        #plot(priices, laags, col = "grey")
-        #lines(ss, col = "purple")
-        #print(predict(ss, x=priices))
-        #print(predict(ss, y=priices))
-        #print(predict(ss, x=11, y = 10))
-        #print(MATRIX[3,2])
-
-        #print(MATRIX)
-        
-        #return (test_val)
         
         x_y = as.data.frame(cbind(Y, MATRIX))
         smoothSpline <- smooth.spline(as.vector(x_y[,3]),as.vector(x_y[,1]), df=6)
         print(x_y)
         x_y[,1] = predict(smoothSpline, x=as.vector(x_y[,3]))$y
         regression = lm(formula = Y ~ ., data = x_y)
+        print(smoothSpline)
 
         # Retrieving regression coefficients
         test_val = (as.matrix(summary(regression)$coefficients[,1],
@@ -317,6 +288,35 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
                               ncol = 1))
 
         return (test_val)
+    } else if (runType == 9) {
+        print(xx[1])
+        print(xx)
+        print(length(xx))
+        predictor1 = xx[1:(length(xx) - 2)]
+        predictor2 = xx[2:(length(xx) - 1)]
+        label = xx[3:length(xx)]
+        df = data.frame(predictor1, predictor2, label)
+        print(predictor1)
+        print(predictor2)
+        print(label)
+        customFunction <- function(x) log(1 + exp(x))
+        nn = neuralnet(label~predictor1+predictor2, data=df, hidden = 3, threshold = 0.01,
+                       stepmax = 1e+05, rep = 1, startweights = NULL,
+                       learningrate.limit = NULL, learningrate.factor = list(minus = 0.5,plus = 1.2), 
+                       learningrate = NULL, lifesign = "none",
+                       lifesign.step = 1000, algorithm = "rprop+", err.fct = "sse",
+                       act.fct = "logistic", linear.output = TRUE, exclude = NULL,
+                       constant.weights = NULL, likelihood = FALSE)
+        print(nn$act.fct(3))
+        plot(nn)
+        print(customFunction(3))
+        print(hidden)
+        print(memory)
+        print(compute(nn, data.frame(c(10.5), c(10.32643))))
+        print(nn$result.matrix)
+        stop()
+        
+        
     }
     
 }
