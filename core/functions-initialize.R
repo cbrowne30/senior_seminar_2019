@@ -15,18 +15,6 @@ rm(list = ls())
 # setwd("~/Senior_Seminar")
 setwd(".")
 
-<<<<<<< HEAD
-=======
-# install.packages("zoo")
-# install.packages("xts")
-library(zoo)
-library(xts)
-library(glmnet)
-library(rlist)
-library(dplyr)
-library(leaps)
-library(neuralnet)
->>>>>>> 1dc1815af5529c8575b96f5504aadd7badc865a3
 ######################## APERITIF #########################
 
 #Package/Dependency Checks and Installation
