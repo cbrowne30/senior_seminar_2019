@@ -21,11 +21,6 @@ GetMacros(inputfile = "inputs/input-lm-v1.2.txt")
 # Commented out 2/20/18.  Will set seed in montecarlo.r
 #set.seed(randSeed) #added 7/17/17
 
-#Error check for more predictors than osbervations
-if (runType == 0 & (lags*powers+1 > memory)){
-  break()
-}
-
 #########################  ######################### #########################
 #
 # GENERAL STRATEGY of sim:
@@ -235,7 +230,7 @@ main = function(Memory, Pupdate) {
   return (numBubbles)
 }
 
-
+#Spline gives function F(x).  Each agent iteratively forecast E(x50) and E(X51) and take average of x51
 
 #THE BUTTON: pull the trigger -- execute main()
 #main(Memory = 100, Pupdate = 0.5)
