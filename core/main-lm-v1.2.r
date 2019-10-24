@@ -3,14 +3,17 @@
 #### Set up environment###
 
 # Adjust this so the working directory is inside the senior_seminar_2019 folder
-#setwd("~/thesis/senior_seminar_2019")
-setwd("~/senior_seminar_2019/test")
+setwd("~/thesis/senior_seminar_2019")
+#setwd("~/senior_seminar_2019/test")
 #setwd(".")
 
 # Import functions library
+source("core/Agents.r")
+source("core/Market.r")
 source("core/functions-initialize.R")
 source("core/functions-estimation.R")
 source("core/functions-helper.R")
+
 
 
 # Loads all of the input parameters globally
@@ -19,6 +22,7 @@ GetMacros(inputfile = "inputs/input-lm-v1.2.txt")
 # Commented out 2/20/18.  Will set seed in montecarlo.r
 #set.seed(randSeed) #added 7/17/17
 
+# PAGE 294 TEXT
 
 #########################  ######################### #########################
 #
@@ -98,31 +102,58 @@ create_initial_data = function(t) {
   
   # "Zoo" Matrix with new data XX=P+d  (there is an NA at XX_t)
   # Changed X to XX 7/17/17
-  new_matrix = UpdateMatrix(PriceDivData = xx,
-                            M = memory,
-                            t = t)
+  if (runType == 7 | runType == 8 | runType == 9) {
+    
+  } else {
+
+
+    new_matrix = UpdateMatrix(PriceDivData = xx,
+                              M = memory,
+                              t = t)
+
   
-  # Forecast XX_t = P_t + d_t based on RepAgent forecast rule Params
-  # changed P_t to XX_t 7/17/17
-  EX_t = Predict_t(matrix_data = new_matrix, Params = RepAgent[2:size], t)
-  
-  # Plug estimate EX_t in for unknown XX_t in data matrix
-  # Changed P_t to EX_t 7/17/17
-  new_matrix[which(index(new_matrix) == t), 2] = EX_t
-  
-  # Use it to estimate XX_(t+1) -- aka iterate forecast and then use
-  # this and the arbitrage condition to generate market price P_t1
-  P_t1 = Market_Price(matrix_data = new_matrix,
-                      market_params = RepAgent[2:size],
-                      r = interest_rates[t-1],
-                      t = t)
-  
-  #APPEND P_t1 to price data
-  UpdateFundamentals(newPrice = P_t1, t)
-  
-  #Storage -- constant until updating occurs
-  AlphaMatrix[t, 2:size] <<- RepAgent[2:size]
-  UpdateParams[t, 2:size] <<- RepAgent[2:size]
+    # Forecast XX_t = P_t + d_t based on RepAgent forecast rule Params
+    # changed P_t to XX_t 7/17/17
+    EX_t = Predict_t(matrix_data = new_matrix, Params = RepAgent[2:size], t)
+    #e2 = Predict_t(matrix_data = new_matrix, Params = unlist(OptimalAgents[[t - 2]]$predictors), t)
+    #print(EX_t)
+    #print(e2)
+    #stop()
+
+    # Plug estimate EX_t in for unknown XX_t in data matrix
+    # Changed P_t to EX_t 7/17/17
+    new_matrix[which(index(new_matrix) == t), 2] = EX_t
+    
+    # Use it to estimate XX_(t+1) -- aka iterate forecast and then use
+    # this and the arbitrage condition to generate market price P_t1
+    P_t1 = Market_Price(matrix_data = new_matrix,
+                        market_params = RepAgent[2:size],
+                        r = interest_rates[t-1],
+                        t = t)
+    
+    #APPEND P_t1 to price data
+    UpdateFundamentals(newPrice = P_t1, t)
+    MarketObject$updatePriceDivInt(newPrice = P_t1, round = t)
+    
+    #Storage -- c onstant until updating occurs
+    AlphaMatrix[t, 2:size] <<- RepAgent[2:size]
+    UpdateParams[t, 2:size] <<- RepAgent[2:size]
+    
+    print("=====================")
+    print("EXT")
+    print(EX_t)
+    print("RepAgent")
+    print(RepAgent)
+    print("NEW MATRIX")
+    print(new_matrix)
+    print("ALPHA")
+    print(AlphaMatrix)
+    print("UPDATE")
+    print(UpdateParams)
+    if (t == 10) {
+      stop()
+    }
+  }
 }
 
 
@@ -130,12 +161,10 @@ create_initial_data = function(t) {
 ### Third Stage: Rest of Simulation (Bulk) ###
 ##############################################
 simulation_loop = function(t) {
+  stop()
   if (t < memory) {
     stop("t is less than memory. This should not be possible")
   } else {
-    if (t %% 100 == 0) {
-      #print(paste("round:" , t), quote = FALSE)
-    }
     
     # "Zoo" Matrix with new data  (there is an NA at P_t)
     new_matrix = UpdateMatrix(PriceDivData = xx,
@@ -203,6 +232,20 @@ main = function(Memory, Pupdate) {
   pupdate <<- Pupdate
   crash_t <<- 0
 
+  MarketObject <<- new("Market", 
+                       optimalAgents = list(), 
+                       agents = list(), 
+                       repAgent = new("RepresentativeAgent"),
+                       prices = c(1),
+                       dividends = c(1),
+                       interestRates = c(1),
+                       xx = c(1),
+                       memory = Memory,
+                       pUpDate = Pupdate,
+                       bubbles = 0,
+                       bubbleRound = 0,
+                       failedTest = FALSE)
+  
   for (t in (lags + 1):rounds) {
     if (t == (lags + 1)) {
       initializer(rounds, popsize)
@@ -213,6 +256,7 @@ main = function(Memory, Pupdate) {
     } else if ((prices[t-1] < bubbleThresholdLow) | (prices[t-1] > bubbleThresholdHigh)) { 
       # check if price has blown up
       # changed ex to prices 7/17/17
+      MarketObject$bubble(round = t)
       crash_t <<- t
       numBubbles = numBubbles + 1
       print("We're Experiencing a Bubble or a Crash")
@@ -220,6 +264,7 @@ main = function(Memory, Pupdate) {
     } else {
       simulation_loop(t)
     }
+    MarketObject$print(verbose=TRUE)
     print_market(t)
   }
   
@@ -227,9 +272,10 @@ main = function(Memory, Pupdate) {
   #print("End of Sim")
   return (numBubbles)
 }
+# save objects then average predictions
 
 
 
 #THE BUTTON: pull the trigger -- execute main()
-#main(Memory = 100, Pupdate = 0.5)
+main(Memory = memory, Pupdate = pupdate)
 

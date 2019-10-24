@@ -74,17 +74,15 @@ UpdateMatrix = function(PriceDivData, M, t) {
 Predict_t = function(matrix_data, Params, t) {
     
     # Get most recent COMPLETE row of data
-    print(matrix_data)
-    print(matrix_data[which(index(matrix_data) == t - 1), ])
+
     pred_inputs = matrix_data[which(index(matrix_data) == t - 1), ]
     
     # writeLines("\npred_inputs:")
     # print(pred_inputs)
     
     # (1x7) x (7x1)
-    x_hat_t = pred_inputs %*% (Params) # changed p to x 7/17/17
-    print(x_hat_t)
-    print("djdjdjjd")
+
+    x_hat_t = pred_inputs  %*% (Params) # changed p to x 7/17/17
     
     return(x_hat_t) # changed p to x 7/17/17
 }

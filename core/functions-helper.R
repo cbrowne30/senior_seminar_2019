@@ -64,17 +64,17 @@ hetero_MSFE = function(matrix_data, prices, t) {
 
 # Compute Market Price (under Perfect/Avg Arbitrage Condition)
 # =update_matrix, =mean_params, =r
-Market_Price = function(matrix_data, market_params, r, t)
-{
+Market_Price = function(matrix_data, market_params, r, t) {
   # take mean of Price + Dividend
   
   # Similar to forecast(i): Dot-Product of MKT-Params[2-8]=beta1 and
   # UpdateMatrix[1]
+  
   mkt_inputs = matrix(tail(matrix_data, 1), ncol = size-1)
- 
+  print(mkt_inputs)
   # dot prod
   X_hat_t1 = mkt_inputs %*% (market_params) # changed P to X 7/17/17
-  
+  print(X_hat_t1)
 
   # R.E.E. mean
   
