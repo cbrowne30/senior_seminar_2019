@@ -19,10 +19,10 @@ setwd(".")
 
 #Package/Dependency Checks and Installation
 DependencyCheck = function() {
-    dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet")
+    dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest", "Rmpi")
     for (depen in dependencies) {
         if(depen %in% rownames(installed.packages()) == FALSE){
-            install.packages(depen)
+            install.packages(depen, dependencies = TRUE)
         }
         library(depen, character.only = TRUE) 
     }
