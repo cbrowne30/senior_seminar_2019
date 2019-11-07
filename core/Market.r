@@ -32,6 +32,7 @@ setRefClass("Market",
                     }
                 },
                 init = function() {
+                  print("YO DAWG")
                     # Initialize Prices
                     prices <<- rep(((dividend / interest) + dividend), (lags + 1))
                     dividends <<- rep(dividend, (lags + 1))
@@ -173,7 +174,7 @@ setRefClass("Market",
                             # print(OptimalAgent)
                             
                             # Now get a random vector of size: popsize:pupdate
-                            update_traders = RandomVec()
+                            update_traders = c(sample(0:numAgents, numAgents * pUpDate))
                             # Selectively update
                             for (j in seq(1:numAgents)) {
                                 if (marketMatrix[j, 1] %in% update_traders) {
@@ -216,7 +217,7 @@ setRefClass("Market",
                     
                     #insert div w/varying prob of div shock
                     randnum = runif(1, min = 0, max = 1)
-                    if (randnum < pshock) {
+                    if (randnum < pShock) {
                         dividends[round] <<- dividend + runif(n = 1,
                                                           min = -shockRangeDiv,
                                                           max = shockRangeDiv)

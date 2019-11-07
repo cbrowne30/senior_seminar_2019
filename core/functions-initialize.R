@@ -29,14 +29,13 @@ DependencyCheck = function() {
 }
 
 
-DependecyCheck = function() {
-    require(zoo)
-    require(xts)
-    require(glmnet)
-    require(rlist)
-    require(dplyr)
-    require(leaps)
-    require(neuralnet)
+DependecyCheckHPCversion = function() {
+  library(zoo)
+  library(xts)
+  library(glmnet)
+  library(rlist)
+  library(dplyr)
+  library(leaps)
 }
 
 # Get Inputs

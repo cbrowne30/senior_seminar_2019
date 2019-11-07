@@ -3,7 +3,7 @@
 #### Set up environment###
 
 # Adjust this so the working directory is inside the senior_seminar_2019 folder
-setwd("~/thesis/senior_seminar_2019")
+setwd("~/senior_seminar_2019")
 #setwd("~/senior_seminar_2019/test")
 #setwd(".")
 
@@ -16,7 +16,7 @@ source("core/functions-estimation.R")
 source("core/functions-helper.R")
 
 #Dependency Check and Attach Packages
-DependencyCheck()
+#DependencyCheck()
 
 
 
@@ -285,46 +285,46 @@ mainTwo = function(MarketObject) {
 
 #THE BUTTON: pull the trigger -- execute main()
 
-s <- (3 + (powers * lags) + (((lags-1) * (lags)) / 2))
+# s <- (3 + (powers * lags) + (((lags-1) * (lags)) / 2))
+# 
+# func <- new("Functions")
+# 
+# MO <<- new("Market", 
+#           optimalAgents = list(), 
+#           agents = list(), 
+#           repAgent = new("RepresentativeAgent"),
+#           prices = c(1),
+#           dividends = c(1),
+#           interestRates = c(1),
+#           xx = c(1),
+#           memory = memory,
+#           pUpDate = pupdate,
+#           bubbles = 0,
+#           bubbleRound = 0,
+#           size = s,
+#           runType = runType,
+#           numAgents = popsize,
+#           numRounds = rounds,
+#           lInit = linit,
+#           randSeed = randSeed,
+#           lags = lags,
+#           powers = powers,
+#           startPrice = startPrice,
+#           bubbleThresholdHigh = bubbleThresholdHigh,
+#           bubbleThresholdLow = bubbleThresholdLow,
+#           interest = interest,
+#           dividend = dividend,
+#           shockRangeDiv = shockRange_div,
+#           riskConstant = risk_constant,
+#           riskType = risk_type,
+#           pShock = pshock,
+#           selectionType = selection_type,
+#           oldRep = vector(),
+#           oldOA = vector(),
+#           helperFunctions = func,
+#           marketMatrix = matrix(),
+#           alphaMatrix = matrix(), 
+#           updateParams = matrix())
 
-func <- new("Functions")
-
-MO <<- new("Market", 
-          optimalAgents = list(), 
-          agents = list(), 
-          repAgent = new("RepresentativeAgent"),
-          prices = c(1),
-          dividends = c(1),
-          interestRates = c(1),
-          xx = c(1),
-          memory = memory,
-          pUpDate = pupdate,
-          bubbles = 0,
-          bubbleRound = 0,
-          size = s,
-          runType = runType,
-          numAgents = popsize,
-          numRounds = rounds,
-          lInit = linit,
-          randSeed = randSeed,
-          lags = lags,
-          powers = powers,
-          startPrice = startPrice,
-          bubbleThresholdHigh = bubbleThresholdHigh,
-          bubbleThresholdLow = bubbleThresholdLow,
-          interest = interest,
-          dividend = dividend,
-          shockRangeDiv = shockRange_div,
-          riskConstant = risk_constant,
-          riskType = risk_type,
-          pShock = pshock,
-          selectionType = selection_type,
-          oldRep = vector(),
-          oldOA = vector(),
-          helperFunctions = func,
-          marketMatrix = matrix(),
-          alphaMatrix = matrix(), 
-          updateParams = matrix())
-
-mainTwo(MarketObject = MO)
+#mainTwo(MarketObject = MO)
 
