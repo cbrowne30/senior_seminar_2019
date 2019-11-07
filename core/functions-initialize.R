@@ -19,7 +19,7 @@ setwd(".")
 
 #Package/Dependency Checks and Installation
 DependencyCheck = function() {
-    dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest", "Rmpi")
+    dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest")
     for (depen in dependencies) {
         if(depen %in% rownames(installed.packages()) == FALSE){
             install.packages(depen, dependencies = TRUE)
@@ -28,8 +28,20 @@ DependencyCheck = function() {
     }
 }
 
+
+DependecyCheck = function() {
+    require(zoo)
+    require(xts)
+    require(glmnet)
+    require(rlist)
+    require(dplyr)
+    require(leaps)
+    require(neuralnet)
+}
+
 # Get Inputs
-GetMacros = function(inputfile) {
+GetMacros = function(inputfile)
+{
     # Get macro inputfile
     input = read.table(inputfile, header = FALSE, sep = " ")
     input = data.frame(input)
@@ -70,55 +82,13 @@ GetMacros = function(inputfile) {
     randSeed <<- subset(input, Varnames == "randSeed")[[2]]
     risk_constant <<- subset(input, Varnames ==  "risk_constant")[[2]]
     risk_type <<- subset(input, Varnames == "risk_type")[[2]]
-    
-    # if (runType == 9) {
-    #     hidden <<- subset(input, Varnames == "hidden")[[2]]
-    #     CheckInputs(hidden, 3)
-    #     threshold <<- subset(input, Varnames == "threshold")[[2]]
-    #     CheckInputs(threshold, 0.01)
-    #     stepmax <<- subset(input, Varnames == "stepmax")[[2]]
-    #     CheckInputs(stepmax, 1e+05)
-    #     rep <<- subset(input, Varnames == "rep")[[2]]
-    #     CheckInputs(rep, 1)
-    #     startweights <<- subset(input, Varnames == "startweights")[[2]]
-    #     CheckInputs(startweights, NULL)
-    #     learningrate_limit <<- subset(input, Varnames == "learningrate_limit")[[2]]
-    #     CheckInputs(learningrate_limit, NULL)
-    #     learningrate_factor <<- subset(input, Varnames == "learningrate_factor")[[2]]
-    #     CheckInputs(learningrate_factor, list(minus = 0.5, plus = 1.2))
-    #     learningrate <<- subset(input, Varnames == "learningrate")[[2]]
-    #     CheckInputs(learningrate, NULL)
-    #     lifesign <<- subset(input, Varnames == "lifesign")[[2]]
-    #     CheckInputs(lifesign, "none")
-    #     lifesign_step <<- subset(input, Varnames == "lifesign_step")[[2]]
-    #     CheckInputs(lifesign_step, 1000)
-    #     algorithm <<- subset(input, Varnames == "algorithm")[[2]]
-    #     CheckInputs(algorithm, "rprop+")
-    #     err_fct <<- subset(input, Varnames == "err_fct")[[2]]
-    #     CheckInputs(err_fct, "sse")
-    #     act_fct <<- subset(input, Varnames == "act_fct")[[2]]
-    #     CheckInputs(act_fct, "logistic")
-    #     linear_output <<- subset(input, Varnames == "linear_output")[[2]]
-    #     CheckInputs(linear_output, TRUE)
-    #     exclude <<- subset(input, Varnames == "exclude")[[2]]
-    #     CheckInputs(exclude, NULL)
-    #     constant_weights <<- subset(input, Varnames == "constant_weights")[[2]]
-    #     CheckInputs(constant_weights, NULL)
-    #     likelihood <<- subset(input, Varnames == "likelihood")[[2]]
-    #     CheckInputs(likelihood, FALSE)
-    # }
 }
 
 
 
 # INIT
 initialize_prices = function(sim_rounds) {
-    MarketObject$prices = rep(((dividend / interest) + dividend), (lags + 1))
-    MarketObject$dividends = rep(dividend, (lags + 1))
-    MarketObject$interestRates = rep(interest, (lags + 1))
-    MarketObject$xx = MarketObject$prices + MarketObject$dividends
-
-
+    
     #PRETTY SURE GETTING RID OF THIS
     #Periods <<- seq(1:sim_rounds)
     
@@ -146,6 +116,7 @@ initialize_market = function(num_agents) {
     # market price
     RepAgent <<- rep(0, (size+2))
     RepAgent[2] <<- (dividend / interest) + dividend
+    
     # initialize matrix (or array) of agents
     Market <<-
         matrix(
@@ -154,21 +125,9 @@ initialize_market = function(num_agents) {
             ncol = size,
             byrow = TRUE
         )
-
+    
     # assign IDs
     Market[1:num_agents]  <<-  seq(1, num_agents, 1)
-
-
-    if (runType == 7 | runType == 8 | runType == 9) {
-        MarketObject$addOptimalAgent(new("OptimalAgent", predictors= vector(mode = "list", length = size), connections = 0)) 
-    } else {
-        MarketObject$addOptimalAgent(new("OptimalAgent", predictors= list(c((dividend / interest) + dividend, rep(0, size - 2))), connections = 0))
-    }
-    for (agent in 1:num_agents) {
-        MarketObject$addAgent(new("Agent", optimalAgent = MarketObject$optimalAgents[[1]]))
-    }
-    
-    MarketObject$updateRepAgent()
     
     # Full weight to a_0 in prelim rounds
     Market[1:num_agents, 2]  <<-
@@ -182,7 +141,9 @@ initialize_market = function(num_agents) {
 
 
 # set up Alpha & Forecast array
-initialize_storage = function(sim_rounds) {
+initialize_storage = function(sim_rounds)
+    #=rounds
+{
     # Initialize Data Storage
     AlphaMatrix  <<-  matrix(
         data = 0,
@@ -206,7 +167,8 @@ initialize_storage = function(sim_rounds) {
 
 
 #Update Price, Dividends, Interest (include commented out shock)
-UpdateFundamentals = function(newPrice, t) { 
+UpdateFundamentals = function(newPrice, t) #=market_price, =div or shock, =r or shock
+{ 
     #insert price
     prices <<- append(prices, newPrice) 
     
@@ -228,8 +190,6 @@ UpdateFundamentals = function(newPrice, t) {
     xx <<- prices+dividends 
 }
 
-CheckInputs = function(v, defaultValue) {
-    if (length(v) == 0) {
-        v = defaultValue
-    }
+CheckInputs = function() {
+    
 }

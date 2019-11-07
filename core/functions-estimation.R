@@ -74,14 +74,14 @@ UpdateMatrix = function(PriceDivData, M, t) {
 Predict_t = function(matrix_data, Params, t) {
     
     # Get most recent COMPLETE row of data
-
+    
     pred_inputs = matrix_data[which(index(matrix_data) == t - 1), ]
     
     # writeLines("\npred_inputs:")
     # print(pred_inputs)
     
     # (1x7) x (7x1)
-
+    
     x_hat_t = pred_inputs  %*% (Params) # changed p to x 7/17/17
     
     return(x_hat_t) # changed p to x 7/17/17
@@ -156,7 +156,7 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
         #print(length(matrix(X, ncol=2)))
         x_y = as.data.frame(cbind(Y, MATRIX))
         regression = lm(formula = Y ~ ., data = x_y)
-
+        
         # Retrieving regression coefficients
         test_val = (as.matrix(summary(regression)$coefficients[,1],
                               nrow = size,
@@ -279,12 +279,12 @@ EstParams = function(new_matrix, t) { # arg1: TS of last M price(EX) obs
         x_y[,1] = predict(smoothSpline, x=as.vector(x_y[,3]))$y
         regression = lm(formula = Y ~ ., data = x_y)
         print(smoothSpline)
-
+        
         # Retrieving regression coefficients
         test_val = (as.matrix(summary(regression)$coefficients[,1],
                               nrow = size,
                               ncol = 1))
-
+        
         return (test_val)
     } else if (runType == 9) {
         print(xx[1])

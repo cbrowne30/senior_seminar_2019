@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -N RSnow
+#PBS -l nodes=4:ppn=8
+#PBS -l walltime=05:00
+#PBS -q una
+
+module load openmpi/3.1.0
+module load R/3.5.0
+
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS=1
+mpiexec -n 1 R CMD BATCH ./rmpi_test.r
+

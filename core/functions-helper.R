@@ -71,11 +71,11 @@ Market_Price = function(matrix_data, market_params, r, t) {
   # UpdateMatrix[1]
   
   mkt_inputs = matrix(tail(matrix_data, 1), ncol = size-1)
-  print(mkt_inputs)
+
   # dot prod
   X_hat_t1 = mkt_inputs %*% (market_params) # changed P to X 7/17/17
-  print(X_hat_t1)
 
+  
   # R.E.E. mean
   
   # Initialize market price without risk aversion
@@ -92,7 +92,7 @@ Market_Price = function(matrix_data, market_params, r, t) {
       }
     }
   }
- 
+  
   return(market_price)
 }
 
@@ -114,9 +114,9 @@ Market_Params = function(market_round) #=Market
 
 Make_Zoos = function(t) { 
   Prices <<- zoo((prices), order.by = seq(1, t, 1))
-	Dividends <<- zoo((dividends), order.by = seq(1, t, 1))
+  Dividends <<- zoo((dividends), order.by = seq(1, t, 1))
   Interest <<- zoo((interest_rates), order.by = seq(1, t, 1))	  
-	XX <<- Prices + Dividends #changed EX to XX 7/17/17
+  XX <<- Prices + Dividends #changed EX to XX 7/17/17
 }
 
 print_market = function(t) {
