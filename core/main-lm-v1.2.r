@@ -47,9 +47,6 @@ initializer = function(sim_rounds, num) {
 ### Second Stage: Loop until linit without updating forecast rule parameter values ###
 ######################################################################################
 create_initial_data = function(t) {
-  #if (t %% 100 == 0) {
-   # print(paste("round:" , t), quote = FALSE)
-  #}
   
   # "Zoo" Matrix with new data XX=P+d  (there is an NA at XX_t)
   # Changed X to XX 7/17/17
@@ -57,11 +54,9 @@ create_initial_data = function(t) {
                             M = memory,
                             t = t)
 
-
   # Forecast XX_t = P_t + d_t based on RepAgent forecast rule Params
   # changed P_t to XX_t 7/17/17
   EX_t = Predict_t(matrix_data = new_matrix, Params = RepAgent[2:size], t)
-  print(EX_t)
 
   # Plug estimate EX_t in for unknown XX_t in data matrix
   # Changed P_t to EX_t 7/17/17
@@ -73,16 +68,9 @@ create_initial_data = function(t) {
                       market_params = RepAgent[2:size],
                       r = interest_rates[t-1],
                       t = t)
-  print(P_t1)
   
   #APPEND P_t1 to price data
   UpdateFundamentals(newPrice = P_t1, t)
-  
-  print(prices)
-  print(xx)
-  if (t == 5) {
-    stop()
-  }
 
   #Storage -- c onstant until updating occurs
   AlphaMatrix[t, 2:size] <<- RepAgent[2:size]
