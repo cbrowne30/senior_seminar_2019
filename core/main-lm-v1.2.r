@@ -1,68 +1,15 @@
-# Agent Based Simulation
-
-#### Set up environment###
-
-# Adjust this so the working directory is inside the senior_seminar_2019 folder
-setwd("~/senior_seminar_2019")
-#setwd("~/senior_seminar_2019/test")
-#setwd(".")
-
-# Import functions library
-source("core/Agents.r")
-source("core/Functions.r")
-source("core/Market.r")
-source("core/functions-initialize.R")
-source("core/functions-estimation.R")
-source("core/functions-helper.R")
-
-#Dependency Check and Attach Packages
-#DependencyCheck()
-
-
-
-
-# Loads all of the input parameters globally
-GetMacros(inputfile = "inputs/input-lm-v1.2.txt")
-
-# Commented out 2/20/18.  Will set seed in montecarlo.r
-#set.seed(randSeed) #added 7/17/17
-
-
-#########################  ######################### #########################
-#
-# GENERAL STRATEGY of sim:
-#
-# Build the UpdateMatrix with [XX = Price+Div] # changed Ex to XX 7/17/17
-#
-# t > linit (note that need linit >= leval + 3)
-# Calculate the Optimal Paramters; send them to --> OptimalAgent
-# selectively(randomly) adopt Optimal Params by Market Agents
-# Note: "Market" at any given round stores each MarketAgent's parameters
-#
-# Calculate mean of market parameters and assign them to RepAgent
-# Forecast P_t with market params -- i.e. calculate forecast by RepAgent
-# Add P_t forecast to UpdateMatrix so we can iterate -- save this forecast for
-# error calcs
-#
-# iterate forward;
-# Calculate Market Price based on RepAgent's forecast (done in just 1 step
-# during bulk of simulation)
-#
-# Update Price, Div, Int, EX vectors
-# Update Storage Arrays --
-# Send OptimalAgent Params to "log" of OptimalParams (UpdateParams)
-# Send RepAgent Params to "log" of MARKET MEAN PARAMS (AlphaMatrix)
-# Send P_t (really P_hat_t) to AlphaMatrix[t, 10] --> use that for later error
-# calcs
-#
-# the price, etc. vectors (related 'zoo' objects are just numerically indexed
-# versions of the same)
-# will be the things to plot
-# also the parameters from the two storage matrices (AlphaMatrix is what we
-# really care about)
-#
-######################### ######################### #########################
-
+##############################################
+# Document: main.r
+# Purpose: Contains the main function for running
+# a simulation 
+# Functions:
+#   1. main
+#   2. mainTwo
+#   3. initializer
+#   4. create_initial_data
+#   5. simulation_loop
+# ToDo:
+##############################################
 
 ################################################################################
 ################################################################################
@@ -207,12 +154,36 @@ simulation_loop = function(t) {
   }
 }
 
+checkPath = function() {
+  path = getwd()
+  if (substr(path,(nchar(path) + 1) - 19, nchar(path)) != "senior_seminar_2019") {
+    
+    if(grepl("senior_seminar_2019", path)) {
+      subStringFound = unlist(gregexpr(pattern = "senior_seminar_2019", path))
+      setwd(substr(path, 0, subStringFound + 19))
+    } else {
+      print("Error - Incorrect path please change it to senior_seminar_2019")
+    }
+    
+  }
+}
+
 
 #################################
 ### Main function ###
 #################################
-main = function(MarketObject) {
-  # Then override the global input that we have from GetMacros with the parameter value.  
+main = function(MarketObject, inputFile) {
+  checkPath()
+  
+  # Import functions library
+  source("core/Agents.r")
+  source("core/Functions.r")
+  source("core/Market.r")
+  source("core/functions-initialize.R")
+  source("core/functions-estimation.R")
+  source("core/functions-helper.R")
+  
+  GetMacros(inputfile = inputFile)
   memory <<- memory
   pupdate <<- pupdate
   crash_t <<- 0
@@ -246,13 +217,24 @@ main = function(MarketObject) {
   #print("End of Sim")
   return (numBubbles)
 }
+
 # 0 no bubble
 # 1 bubble
 # -1 fail
 
-mainTwo = function(MarketObject) {
+mainTwo = function(MarketObject, inputFile) {
   # Then override the global input that we have from GetMacros with the parameter value
+  checkPath()
   
+  # Import functions library
+  source("core/Agents.r")
+  source("core/Functions.r")
+  source("core/Market.r")
+  source("core/functions-initialize.R")
+  source("core/functions-estimation.R")
+  source("core/functions-helper.R")
+  
+  GetMacros(inputfile = inputFile)
   for (round in (MarketObject$lags + 1):MarketObject$numRounds) {
     if (round == (MarketObject$lags + 1)) {
       MarketObject$init()
@@ -265,14 +247,10 @@ mainTwo = function(MarketObject) {
       # check if price has blown up
       # changed ex to prices 7/17/17
       return (c(1, round, MarketObject$memory, MarketObject$pUpDate))
-      # crash_t <<- round
-      # numBubbles = numBubbles + 1
-      # print("We're Experiencing a Bubble or a Crash")
     } else {
       MarketObject$simulation(round)
     }
     MarketObject$print(verbose=TRUE, round)
-    #print_market(round)
   }
   
   #Make_Zoos(round)
@@ -287,7 +265,6 @@ mainTwo = function(MarketObject) {
 
 # s <- (3 + (powers * lags) + (((lags-1) * (lags)) / 2))
 # 
-# func <- new("Functions")
 # 
 # MO <<- new("Market", 
 #           optimalAgents = list(), 
@@ -321,7 +298,6 @@ mainTwo = function(MarketObject) {
 #           selectionType = selection_type,
 #           oldRep = vector(),
 #           oldOA = vector(),
-#           helperFunctions = func,
 #           marketMatrix = matrix(),
 #           alphaMatrix = matrix(), 
 #           updateParams = matrix())

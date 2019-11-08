@@ -1,3 +1,12 @@
+##############################################
+# Document: Market.r
+# Purpose: Holds the definition of a Market class
+# that holds input data and methods to perform a
+# simulation.
+# Classes:
+#   1. Market
+# ToDo:
+##############################################
 
 setRefClass("Market",
             fields = list(optimalAgents = "list", agents = "list", repAgent = "RepresentativeAgent", 

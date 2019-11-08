@@ -1,3 +1,13 @@
+##############################################
+# Document: Agents.r
+# Purpose: Contains the main function for running
+# a simulation 
+# Classes:
+#   1. OptimalAgent
+#   2. RepresentativeAgent - subclass of OptimalAgent
+#   3. Agent - Points to an OptimalAgent
+# ToDo:
+##############################################
 
 setRefClass("OptimalAgent",
             fields = list(predictors = "list", connections = "numeric"),

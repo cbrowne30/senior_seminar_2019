@@ -189,6 +189,16 @@ UpdateFundamentals = function(newPrice, t) #=market_price, =div or shock, =r or 
     xx <<- prices+dividends 
 }
 
-CheckInputs = function() {
-    
+checkPath = function() {
+    path = getwd()
+    if (substr(path,(nchar(path) + 1) - 19, nchar(path)) != "senior_seminar_2019") {
+        
+        if(grepl("senior_seminar_2019", path)) {
+            subStringFound = unlist(gregexpr(pattern = "senior_seminar_2019", path))
+            setwd(substr(path, 0, subStringFound + 19))
+        } else {
+            print("Error - Incorrect path please change it to senior_seminar_2019")
+        }
+        
+    }
 }

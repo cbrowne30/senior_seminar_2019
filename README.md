@@ -42,3 +42,38 @@
 - dplyr
 - leaps
 - neuralnet
+
+########################  ######################### #########################
+
+GENERAL STRATEGY of sim:
+
+Build the UpdateMatrix with [XX = Price+Div] # changed Ex to XX 7/17/17
+
+t > linit (note that need linit >= leval + 3)
+Calculate the Optimal Paramters; send them to --> OptimalAgent
+selectively(randomly) adopt Optimal Params by Market Agents
+Note: "Market" at any given round stores each MarketAgent's parameters
+
+Calculate mean of market parameters and assign them to RepAgent
+Forecast P_t with market params -- i.e. calculate forecast by RepAgent
+Add P_t forecast to UpdateMatrix so we can iterate -- save this forecast for
+error calcs
+
+iterate forward;
+Calculate Market Price based on RepAgent's forecast (done in just 1 step
+during bulk of simulation)
+
+Update Price, Div, Int, EX vectors
+Update Storage Arrays --
+Send OptimalAgent Params to "log" of OptimalParams (UpdateParams)
+Send RepAgent Params to "log" of MARKET MEAN PARAMS (AlphaMatrix)
+Send P_t (really P_hat_t) to AlphaMatrix[t, 10] --> use that for later error
+calcs
+
+the price, etc. vectors (related 'zoo' objects are just numerically indexed
+versions of the same)
+will be the things to plot
+also the parameters from the two storage matrices (AlphaMatrix is what we
+really care about)
+
+######################## ######################### #########################
