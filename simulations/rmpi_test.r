@@ -2,9 +2,9 @@ setwd("~/senior_seminar_2019/core/")
 source("main-lm-v1.2.r")
 
 startTime = Sys.time()
-mem_list = seq(50, 50, 10)
-pupdate_list = seq(0.5, 0.5, 0.2)
-num_sims = 50
+mem_list = seq(10, 100, 10)
+pupdate_list = seq(0.1, 0.9, 0.)
+num_sims = 10
 Market_List = list()
 func = new("Functions")
 for (mem in mem_list){
@@ -18,8 +18,8 @@ for (mem in mem_list){
                dividends = c(1),
                interestRates = c(1),
                xx = c(1),
-               memory = memory,
-               pUpDate = pupdate,
+               memory = mem,
+               pUpDate = pup,
                bubbles = 0,
                bubbleRound = 0,
                size = s,
@@ -85,16 +85,38 @@ mpi.remote.exec(source("core/Market.r"))
 mpi.bcast.Robj2slave(DependecyCheckHPCversion)
 mpi.remote.exec(DependecyCheckHPCversion())
 
+row = 1
+col = 1
+agg_matrix = matrix(nrow = length(mem_list), ncol = length(pupdate_list), dimnames = list(mem_list, pupdate_list))
 
 for(market in Market_List){
   runList = list()
   for (i in 1:num_sims){
     runList = append(runList, market)
   }
-  x <- mpi.applyLB(runList, mainTwo)
-  print(x)
+  returns <- mpi.applyLB(runList, mainTwo)
+  print(returns)
+  num_bubbles = 0
+  actual_sims = num_sims
+  for (run in returns){
+    if (run[1] == 1){
+      num_bubbles = num_bubbles + 1
+    }
+    else if (run[1]== -1) {
+      actual_sims = actual_sims -1
+    }
+  }
+  bub_percent = num_bubbles/num_sims
+  bub_percent = round(bub_percent, digits = 3)
+  agg_matrix[row, col] = bub_percent
+  if (col == length(pupdate_list)){
+    row = row+1
+    col = 1
+  } else{
+    col = col+1
+  }
 }
-
+print(agg_matrix)
 print(Sys.time() - startTime)
 # Tell all slaves to close down, and exit the program
 mpi.close.Rslaves(dellog = FALSE)
