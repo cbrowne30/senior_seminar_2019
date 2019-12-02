@@ -1,5 +1,34 @@
-setwd("~/senior_seminar_2019/core/")
-source("main-lm-v1.2.r")
+##############################################
+# Document: monteCarlo.r
+# Purpose: Used for running a montecarlo simulation
+# Functions:
+#   1. checkPath
+# ToDo:
+##############################################
+
+checkPath = function() {
+  path = getwd()
+  if (substr(path,(nchar(path) + 1) - 19, nchar(path)) != "senior_seminar_2019") {
+    
+    if(grepl("senior_seminar_2019", path)) {
+      subStringFound = unlist(gregexpr(pattern = "senior_seminar_2019", path))
+      setwd(substr(path, 0, subStringFound + 19))
+    } else {
+      print("Error - Incorrect path please change it to senior_seminar_2019")
+    }
+    
+  }
+}
+
+checkPath()
+
+# Import functions library
+source("core/Functions.r")
+source("core/Agents.r")
+source("core/Market.r")
+source("core/main-lm-v1.2.r")
+
+dependencyCheck(onHPC = TRUE)
 
 startTime = Sys.time()
 mem_list = seq(10, 100, 10)

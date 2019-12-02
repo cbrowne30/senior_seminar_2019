@@ -11,5 +11,5 @@ module load R/3.5.0
 
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=1
-mpiexec -n 1 R CMD BATCH ./rmpi_test.r
+mpiexec -n 1 R CMD BATCH ./rmpi_test.r $1
 

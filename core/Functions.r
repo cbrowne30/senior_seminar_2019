@@ -151,17 +151,27 @@ hetero_MSFE = function(matrixData, round, MarketObject) {
     return (avg_msfe)
 }
 
-marketParams = function(MarketObject) {
-    # take mean over columns 2:8 of market
-    mkt = data.frame(MarketObject$marketMatrix)
-    mean_params = c()
-    for (i in 2:MarketObject$size){
-        mean_params <- c(mean_params, mean(mkt[, i], na.rm = TRUE))
+calculateRepAgent = function(MarketObject) {
+    if (MarketObject$runType < 7) {
+        # take mean over columns 2:8 of market
+        mkt = data.frame(MarketObject$marketMatrix)
+        mean_params = c()
+        for (i in 2:MarketObject$size){
+            mean_params <- c(mean_params, mean(mkt[, i], na.rm = TRUE))
+        }
+        return(mean_params)
+    } else {
+        totalPrice = 0
+        lastPrice = MarketObject$xx[[length(MarketObject$xx)]]
+        for (optimalAgent in MarketObject$optimalAgents) {
+            totalPrice = totalPrice + (optimalAgent$predict(MarketObject = MarketObject) * optimalAgent$connections)
+        }
+        return(totalPrice / MarketObject$numAgents)
     }
-    return(mean_params)
 }
 
-estParams = function(new_matrix, round, MarketObject) { # arg1: TS of last M price(EX) obs
+estParams = function(new_matrix, round, MarketObject) { 
+    # arg1: TS of last M price(EX) obs
     # arg2: matrix of last M obs, 1-lag
     # goal is to fit AR model on M obs
     # Matrix Mult should spit out the Optimal BetaVec
@@ -176,15 +186,17 @@ estParams = function(new_matrix, round, MarketObject) { # arg1: TS of last M pri
     # print(new_matrix)
     
     # change
-    Y = new_matrix[2:which(index(new_matrix) == round - 1), 2]
-    
-    X = matrix(new_matrix, ncol = MarketObject$size - 1)
-    
-    #convert data to matrices
-    Y = matrix(Y, ncol= 1)
-    colnames(Y)[1] <- "Y"
-    
-    MATRIX = X[1:(nrow(X) - 2),]
+    if (runType < 7) {
+        Y = new_matrix[2:which(index(new_matrix) == round - 1), 2]
+        
+        X = matrix(new_matrix, ncol = MarketObject$size - 1)
+        
+        #convert data to matrices
+        Y = matrix(Y, ncol= 1)
+        colnames(Y)[1] <- "Y"
+        
+        MATRIX = X[1:(nrow(X) - 2),]
+    }
     
     ##########
     # Note: runType is set in input-lm-v1.2.txt
@@ -338,34 +350,107 @@ estParams = function(new_matrix, round, MarketObject) { # arg1: TS of last M pri
         
         return (test_val)
     } else if (MarketObject$runType == 9) {
-        print(MarketObject$xx[1])
-        print(MarketObject$xx)
-        print(length(MarketObject$xx))
-        predictor1 = MarketObject$xx[1:(length(MarketObject$xx) - 2)]
-        predictor2 = MarketObject$xx[2:(length(MarketObject$xx) - 1)]
-        label = MarketObject$xx[3:length(MarketObject$xx)]
-        df = data.frame(predictor1, predictor2, label)
-        print(predictor1)
-        print(predictor2)
-        print(label)
+        numberPredictors = 3
+        df = data.frame(seq(1, MarketObject$memory - numberPredictors, 1))
+        for (predictor in 1:numberPredictors) {
+            df[paste("p", toString(predictor), sep="")] = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + predictor) : (length(MarketObject$xx) - numberPredictors + predictor - 1)]
+        }
+        formula = as.formula(paste("label ~ p", paste(seq(1,numberPredictors, 1), collapse = " + p"), sep=""))
+        label = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + predictor + 1) : (length(MarketObject$xx))]
+        df['label'] = label
         customFunction <- function(x) log(1 + exp(x))
-        nn = neuralnet(label~predictor1+predictor2, data=df, hidden = 3, threshold = 0.01,
+        nn = neuralnet(formula, data=df, hidden = 3, threshold = 0.08,
                        stepmax = 1e+05, rep = 1, startweights = NULL,
                        learningrate.limit = NULL, learningrate.factor = list(minus = 0.5,plus = 1.2), 
                        learningrate = NULL, lifesign = "none",
                        lifesign.step = 1000, algorithm = "rprop+", err.fct = "sse",
                        act.fct = "logistic", linear.output = TRUE, exclude = NULL,
                        constant.weights = NULL, likelihood = FALSE)
-        print(nn$act.fct(3))
-        plot(nn)
-        print(customFunction(3))
-        print(hidden)
-        print(memory)
-        print(compute(nn, data.frame(c(10.5), c(10.32643))))
-        print(nn$result.matrix)
-        stop()
-        
-        
+        return(nn)
     }
-    
 }
+
+prediction = function(nn, df) {
+    result = tryCatch({
+        return(predict(nn, df)[[1]])
+    }, warning = function(war) {
+        print("Warning")
+    }, error = function(err) {
+        print("ERORR FUCKING ERROR")
+        print(err)
+    })
+    return(result)
+}
+
+
+#Package/Dependency Checks and Installation
+dependencyCheck = function(onHPC) {
+    if (onHPC == TRUE) {
+        library(zoo)
+        library(xts)
+        library(glmnet)
+        library(rlist)
+        library(dplyr)
+        library(leaps)
+        library(neuralnet)
+    } else {
+        dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest")
+        for (depen in dependencies) {
+            if(depen %in% rownames(installed.packages()) == FALSE){
+                install.packages(depen, dependencies = TRUE)
+            }
+            library(depen, character.only = TRUE) 
+        }
+    }
+}
+
+# Get Inputs
+GetMacros = function(inputfile)
+{
+    # Get macro inputfile
+    input = read.table(inputfile, header = FALSE, sep = " ")
+    input = data.frame(input)
+    
+    # get rid of scientific notation
+    options(scipen = 999)
+    # names
+    colnames(input) <- c("Varnames", "V2")
+    
+    # macro vars
+    rounds <<- subset(input, Varnames == "rounds")[[2]]
+    popsize <<- subset(input, Varnames == "popsize")[[2]]
+    bubbleThresholdHigh <<-
+        subset(input, Varnames == "bubbleThresholdHigh")[[2]]
+    bubbleThresholdLow <<-
+        subset(input, Varnames == "bubbleThresholdLow")[[2]]
+    pupdate <<- subset(input, Varnames == "pupdate")[[2]]
+    
+    powers <<- subset(input, Varnames == "powers")[[2]]
+    lags <<- subset(input, Varnames == "lags")[[2]]
+    layers <<- subset(input, Varnames == "layers")[[2]]
+    numBubbles <<- subset(input, Varnames == "numBubbles")[[2]]
+    
+    # initial conditions
+    startPrice <<- subset(input, Varnames == "startPrice")[[2]]
+    dividend <<- subset(input, Varnames == "dividend")[[2]]
+    interest <<- subset(input, Varnames == "interest")[[2]]
+    
+    # note: rename leval=memory
+    memory <<- subset(input, Varnames == "memory")[[2]]
+    linit <<- subset(input, Varnames == "linit")[[2]]
+    # maxiter???? <<- subset(input,Varnames == "linit")[[2]]
+    shockRange_div <<- subset(input, Varnames == "shockRangeDiv")[[2]]
+    runType <<- subset(input, Varnames == "runType")[[2]]
+    selection_type <<- subset(input, Varnames == "selection_type")[[2]]
+    
+    pshock <<- subset(input, Varnames == "pshock")[[2]]
+    randSeed <<- subset(input, Varnames == "randSeed")[[2]]
+    risk_constant <<- subset(input, Varnames ==  "risk_constant")[[2]]
+    risk_type <<- subset(input, Varnames == "risk_type")[[2]]
+}
+
+printSomething = function(x) {
+    print(x)
+}
+
+

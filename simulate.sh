@@ -9,42 +9,43 @@
 # of input files.  This way you can run repeated experiments with the same input
 # file without having to copy it over every time. 
 
+### Functions ###
 
-
-
-echo "Creating new simulation directory" $1
-if [ -d $1 ]; then
+monteCarlo() {
+  # TO RUN montecarlo simulation:
+  # ./simulate.sh montecarlo inputFileName newDirectoryName outputFileName
+  echo "Running MonteCarlo simulation"
+  echo "Creating new simulation directory" $2
+  if [ -d $2 ]; then
     echo "Deleting existing directory"
-    rm -rf $1
+    rm -rf $2
+  fi
+  
+  # Make a copy of the simulations folder
+  cp -r core/ $1
+  
+  # Copy the input file specified by second argument into new directory
+  cp inputs/$1 $2/$1
+  
+  qsub run.job $2
+}
+
+singleRun() {
+  echo "Running a single simulation"
+  RScript core/singleRun.r "inputs/$1"
+}
+
+unitTests() {
+  echo "Running Unit Tests"
+}
+
+
+if [ $1 = "montecarlo" ]; then
+  monteCarlo $2 $3
+elif [ $1 = "unittests" ]; then
+  unitTests
+else
+  singleRun $2
 fi
-
-# Make a copy of the simulations folder
-cp -r simulations/ $1
-
-# Copy the input file specified by second argument into new directory
-cp inputs/$2 $1/$2
-# Copy main file into new directory
-cp core/main-lm-v1.2.r $1/
-
-echo "Setting working directory as ~/Senior_Seminar/"$1 "and output file as" $3
-wd="~/Senior_Seminar/"$1
-
-# Replace setwd("~/Senior_Seminar/simulations") with setwd("Senior_Seminar/new_directory")
-sed -i 's.\/simulations.\/'$1'.' $1/montecarlo.r
-
-# Replace other occurences of simulations in montecarlo.r
-sed -i 's.simulations\/.'$1'\/.' $1/montecarlo.r
-
-# Replace output file name with new output file name
-sed -i 's/output.rds/'$3'/g' $1/montecarlo.r
-
-# Replace input file path in main file to local input file path
-sed -i -e 's/input-lm-v1\.2\.txt/'$1'\/'$2'/' $1/main-lm-v1.2.r
-
-# Then move into the new directory and submit the file to the queue
-cd $1
-qsub run.run
-
-#The output file gets moved to the new directory from the R script once is it generated
 
 

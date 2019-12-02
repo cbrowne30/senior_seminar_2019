@@ -10,11 +10,22 @@
 ##############################################
 
 setRefClass("OptimalAgent",
-            fields = list(predictors = "list", connections = "numeric"),
+            fields = c("predictors", "connections"),
             methods = list(
-                predict = function(x) {
+                predict = function(MarketObject) {
                     if (runType == 9) {
-                       
+                      if (is.null(predictors)) {
+                        return(10.5)
+                      } else {
+                        numberPredictors = 3
+                        df = data.frame(1)
+                        
+                        for (i in (numberPredictors - 1):0) {
+                          df[paste("p", toString(i), sep = "")] = MarketObject$xx[[length(MarketObject$xx) - i]]
+                        }
+                        df = subset(df, select = -c(X1))
+                        return(prediction(predictors, df))
+                      }
                     } else if (runType == 10) {
                        
                     } else if (runType == 8) {
