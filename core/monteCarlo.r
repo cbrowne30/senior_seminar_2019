@@ -16,7 +16,6 @@ checkPath = function() {
     } else {
       print("Error - Incorrect path please change it to senior_seminar_2019")
     }
-    
   }
 }
 
@@ -28,57 +27,78 @@ source("core/Agents.r")
 source("core/Market.r")
 source("core/main-lm-v1.2.r")
 
+
+
 dependencyCheck(onHPC = TRUE)
 
 startTime = Sys.time()
-mem_list = seq(10, 100, 10)
-pupdate_list = seq(0.1, 0.9, 0.)
-num_sims = 10
+mem_list = seq(100, 100, 10)
+pupdate_list = seq(0.7, 0.7, 0.1)
+num_sims = 15
 Market_List = list()
-func = new("Functions")
+#set.seed(3)
+
+GetMacros("inputs/input-lm-v1.2.txt")
+# args = commandArgs(trailingOnly=TRUE)
+# if (length(args)==0) {
+#   stop("At least one argument must be supplied - the input file", call.=FALSE)
+# } else if (length(args)==1) {
+#   GetMacros(inputfile = args[1])
+#   if (saveData != 0 | saveData != 1){
+#     print("Error.  saveData was not equal to 1 or 0. Setting saveData to 0 (Not saving market)")
+#   }
+
+Run_List = list()
+Market_Runs = list()
 for (mem in mem_list){
   for (pup in pupdate_list){
+    Run_List = list()
     s <- (3 + (powers * lags) + (((lags-1) * (lags)) / 2))
-    MO = new("Market", 
-               optimalAgents = list(), 
-               agents = list(), 
-               repAgent = new("RepresentativeAgent"),
-               prices = c(1),
-               dividends = c(1),
-               interestRates = c(1),
-               xx = c(1),
-               memory = mem,
-               pUpDate = pup,
-               bubbles = 0,
-               bubbleRound = 0,
-               size = s,
-               runType = runType,
-               numAgents = popsize,
-               numRounds = rounds,
-               lInit = linit,
-               randSeed = randSeed,
-               lags = lags,
-               powers = powers,
-               startPrice = startPrice,
-               bubbleThresholdHigh = bubbleThresholdHigh,
-               bubbleThresholdLow = bubbleThresholdLow,
-               interest = interest,
-               dividend = dividend,
-               shockRangeDiv = shockRange_div,
-               riskConstant = risk_constant,
-               riskType = risk_type,
-               pShock = pshock,
-               selectionType = selection_type,
-               oldRep = vector(),
-               oldOA = vector(),
-               helperFunctions = func,
-               marketMatrix = matrix(),
-               alphaMatrix = matrix(), 
-               updateParams = matrix())
-    
-    Market_List = append(Market_List, MO)
+    for (i in 1:num_sims){
+      MO = new("Market", 
+                optimalAgents = list(), 
+                agents = list(), 
+                repAgent = new("RepresentativeAgent"),
+                prices = c(1),
+                dividends = c(1),
+                interestRates = c(1),
+                xx = c(1),
+                thresholdTally = 0,
+                priceDifThreshold = priceDifThreshold,
+                saveData = saveData,
+                memory = mem,
+                pUpDate = pup,
+                bubbles = 0,
+                bubbleRound = 0,
+                size = s,
+                runType = runType,
+                numAgents = popsize,
+                numRounds = rounds,
+                lInit = linit,
+                randSeed = sample(1:2^15, 1),
+                lags = lags,
+                powers = powers,
+                startPrice = startPrice,
+                bubbleThresholdHigh = bubbleThresholdHigh,
+                bubbleThresholdLow = bubbleThresholdLow,
+                interest = interest,
+                dividend = dividend,
+                shockRangeDiv = shockRange_div,
+                riskConstant = risk_constant,
+                riskType = risk_type,
+                pShock = pshock,
+                selectionType = selection_type,
+                oldRep = vector(),
+                oldOA = vector(),
+                marketMatrix = matrix(),
+                alphaMatrix = matrix(), 
+                updateParams = matrix())
+      Run_List = append(Run_List, MO)
+    }
+    Market_Runs[[length(Market_Runs)+1]] <- Run_List
   }
 }
+#}
 
 # Load the R MPI package if it is not already loaded.
 if (!is.loaded("mpi_initialize")) {
@@ -111,20 +131,25 @@ mpi.remote.exec(paste("I am",mpi.comm.rank(),"of",mpi.comm.size()))
 mpi.remote.exec(source("core/Agents.r"))
 mpi.remote.exec(source("core/Functions.r"))
 mpi.remote.exec(source("core/Market.r"))
-mpi.bcast.Robj2slave(DependecyCheckHPCversion)
-mpi.remote.exec(DependecyCheckHPCversion())
+mpi.bcast.Robj2slave(dependencyCheck)
+mpi.remote.exec(dependencyCheck(onHPC = TRUE))
+
 
 row = 1
 col = 1
 agg_matrix = matrix(nrow = length(mem_list), ncol = length(pupdate_list), dimnames = list(mem_list, pupdate_list))
 
-for(market in Market_List){
-  runList = list()
-  for (i in 1:num_sims){
-    runList = append(runList, market)
-  }
-  returns <- mpi.applyLB(runList, mainTwo)
+#Set starting market number for progress checker
+numMarket = 1
+
+for(marketGroup in Market_Runs){
+  returns <- mpi.applyLB(marketGroup, main)
+  
+  #Progress prints to output file
+  print(paste0("Finished ", numMarket, " of ", length(Market_Runs), " market types"))
+  
   print(returns)
+  
   num_bubbles = 0
   actual_sims = num_sims
   for (run in returns){
@@ -135,7 +160,7 @@ for(market in Market_List){
       actual_sims = actual_sims -1
     }
   }
-  bub_percent = num_bubbles/num_sims
+  bub_percent = num_bubbles/actual_sims
   bub_percent = round(bub_percent, digits = 3)
   agg_matrix[row, col] = bub_percent
   if (col == length(pupdate_list)){
@@ -145,6 +170,7 @@ for(market in Market_List){
     col = col+1
   }
 }
+
 print(agg_matrix)
 print(Sys.time() - startTime)
 # Tell all slaves to close down, and exit the program

@@ -11,6 +11,7 @@
 setRefClass("Market",
             fields = list(optimalAgents = "list", agents = "list", repAgent = "RepresentativeAgent", 
                           prices = "vector", interestRates = "vector", dividends = "vector", xx = "vector",
+                          priceDifThreshold = "numeric", thresholdTally = "numeric", saveData = "numeric",
                           memory = "numeric", pUpDate = "numeric", bubbles = "numeric", bubbleRound = "numeric",
                           size = "numeric", runType = "numeric", numAgents = "numeric", numRounds = "numeric", 
                           lInit = "numeric", randSeed = "numeric", lags = "numeric", powers = "numeric",

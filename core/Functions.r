@@ -186,7 +186,7 @@ estParams = function(new_matrix, round, MarketObject) {
     # print(new_matrix)
     
     # change
-    if (runType < 7) {
+    if (MarketObject$runType < 7) {
         Y = new_matrix[2:which(index(new_matrix) == round - 1), 2]
         
         X = matrix(new_matrix, ncol = MarketObject$size - 1)
@@ -367,7 +367,10 @@ estParams = function(new_matrix, round, MarketObject) {
                        act.fct = "logistic", linear.output = TRUE, exclude = NULL,
                        constant.weights = NULL, likelihood = FALSE)
         return(nn)
+    } else if (MarketObject$runType == 10){
+      
     }
+  
 }
 
 prediction = function(nn, df) {
@@ -392,7 +395,8 @@ dependencyCheck = function(onHPC) {
         library(rlist)
         library(dplyr)
         library(leaps)
-        library(neuralnet)
+        #library(neuralnet)
+        #library(randomForest)
     } else {
         dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest")
         for (depen in dependencies) {
@@ -447,6 +451,9 @@ GetMacros = function(inputfile)
     randSeed <<- subset(input, Varnames == "randSeed")[[2]]
     risk_constant <<- subset(input, Varnames ==  "risk_constant")[[2]]
     risk_type <<- subset(input, Varnames == "risk_type")[[2]]
+    
+    priceDifThreshold <<- subset(input, Varnames == "priceDifThreshold")[[2]]
+    saveData <<- subset(input, Varnames == "saveData")[[2]]
 }
 
 printSomething = function(x) {

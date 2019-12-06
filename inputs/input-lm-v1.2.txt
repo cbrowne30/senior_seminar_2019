@@ -1,26 +1,32 @@
-popsize 200
 
-rounds 2000
-linit 500
+popsize 200
+priceDifThreshold 0.5
+saveData 1
+
+rounds 200
+linit 100
 memory 50
 pupdate 0.50
 randSeed 5
-lags 1
-powers 2
+lags 2
+powers 3
 numBubbles 0
 
 startPrice 10
 bubbleThresholdHigh 20.0
 bubbleThresholdLow 0.0
 
+
+
 noiserange 0
 interest 0.05
 dividend 0.5
 shockRangeDiv 0.5 
 
+
 risk_constant 0
 risk_type 0
 pshock 0.8
 
-runType 9
+runType 0
 selection_type 2

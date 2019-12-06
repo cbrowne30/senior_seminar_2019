@@ -15,24 +15,25 @@ monteCarlo() {
   # TO RUN montecarlo simulation:
   # ./simulate.sh montecarlo inputFileName newDirectoryName outputFileName
   echo "Running MonteCarlo simulation"
-  echo "Creating new simulation directory" $2
-  if [ -d $2 ]; then
-    echo "Deleting existing directory"
-    rm -rf $2
-  fi
+  echo "$1"
+  #echo "Creating new simulation directory" $2
+  # if [ -d $2 ]; then
+  #   echo "Deleting existing directory"
+  #   rm -rf $2
+  # fi
+  # 
+  # # Make a copy of the simulations folder
+  # cp -r core/ $1
+  # 
+  # # Copy the input file specified by second argument into new directory
+  # cp inputs/$1 $2/$1
   
-  # Make a copy of the simulations folder
-  cp -r core/ $1
-  
-  # Copy the input file specified by second argument into new directory
-  cp inputs/$1 $2/$1
-  
-  qsub run.job $2
+  qsub core/run.job
 }
 
 singleRun() {
   echo "Running a single simulation"
-  RScript core/singleRun.r "inputs/$1"
+  Rscript core/singleRun.r "inputs/$1"
 }
 
 unitTests() {
