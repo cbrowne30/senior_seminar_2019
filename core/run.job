@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -N RSnow
-#PBS -l nodes=10:ppn=4
-#PBS -l mem=10GB 
-#PBS -l walltime=15:00
+#PBS -l nodes=4:ppn=4
+#PBS -l mem=8GB 
+#PBS -l walltime=200:00:00
 #PBS -q una-long
 #PBS -M hcohen@hamilton.edu 
 
@@ -11,5 +11,3 @@ module load R/3.5.0
 
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=1
-mpiexec -n 1 R CMD BATCH ./core/monteCarlo.r output2
-

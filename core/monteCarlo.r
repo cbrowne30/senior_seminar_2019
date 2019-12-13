@@ -5,6 +5,7 @@
 #   1. checkPath
 # ToDo:
 ##############################################
+#!/usr/bin/env Rscript
 
 checkPath = function() {
   path = getwd()
@@ -27,18 +28,24 @@ source("core/Agents.r")
 source("core/Market.r")
 source("core/main-lm-v1.2.r")
 
+# Make sure input file was input
+if (length(args)==0) {
+  stop("Input File must be given", call.=FALSE)
+}
 
+args <- commandArgs(trailingOnly = TRUE)
+sink(paste(args[2], "/", args[3], sep = ""), append=FALSE, split=FALSE)
 
 dependencyCheck(onHPC = TRUE)
 
 startTime = Sys.time()
 mem_list = seq(100, 100, 10)
-pupdate_list = seq(0.7, 0.7, 0.1)
-num_sims = 15
+pupdate_list = seq(0.1, 0.1, 0.1)
+num_sims = 10
 Market_List = list()
 #set.seed(3)
 
-GetMacros("inputs/input-lm-v1.2.txt")
+GetMacros(paste("inputs/", args[1], sep = ""))
 # args = commandArgs(trailingOnly=TRUE)
 # if (length(args)==0) {
 #   stop("At least one argument must be supplied - the input file", call.=FALSE)
@@ -147,7 +154,7 @@ for(marketGroup in Market_Runs){
   
   #Progress prints to output file
   print(paste0("Finished ", numMarket, " of ", length(Market_Runs), " market types"))
-  
+  numMarket = numMarket + 1
   print(returns)
   
   num_bubbles = 0

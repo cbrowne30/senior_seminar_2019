@@ -3,13 +3,13 @@ popsize 200
 priceDifThreshold 0.5
 saveData 1
 
-rounds 200
-linit 100
+rounds 2000
+linit 500
 memory 50
 pupdate 0.50
 randSeed 5
-lags 2
-powers 3
+lags 1
+powers 1
 numBubbles 0
 
 startPrice 10

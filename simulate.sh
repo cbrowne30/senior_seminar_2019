@@ -15,20 +15,26 @@ monteCarlo() {
   # TO RUN montecarlo simulation:
   # ./simulate.sh montecarlo inputFileName newDirectoryName outputFileName
   echo "Running MonteCarlo simulation"
-  echo "$1"
-  #echo "Creating new simulation directory" $2
-  # if [ -d $2 ]; then
-  #   echo "Deleting existing directory"
-  #   rm -rf $2
-  # fi
-  # 
-  # # Make a copy of the simulations folder
-  # cp -r core/ $1
-  # 
-  # # Copy the input file specified by second argument into new directory
-  # cp inputs/$1 $2/$1
   
-  qsub core/run.job
+  echo "Creating new simulation directory" $2
+   if [ -d $2 ]; then
+     echo "Deleting existing directory"
+     rm -rf $2
+  fi
+  
+  # Make a copy of the simulations folder
+   cp -r core/ $2
+  
+  # Copy the input file specified by second argument into new directory
+  cp inputs/$1 $2/$1
+  
+  INPUT_FILE=$1
+  NEW_DIRECTORY=$2
+  OUTPUT_FILE=$3
+  
+  echo "mpiexec -n 1 Rscript ./core/monteCarlo.r $INPUT_FILE $NEW_DIRECTORY $OUTPUT_FILE" >> $2/run.job
+  qsub $2/run.job
+  #sed -i '$d' core/run.job
 }
 
 singleRun() {
@@ -42,7 +48,7 @@ unitTests() {
 
 
 if [ $1 = "montecarlo" ]; then
-  monteCarlo $2 $3
+  monteCarlo $2 $3 $4
 elif [ $1 = "unittests" ]; then
   unitTests
 else
