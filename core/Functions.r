@@ -321,19 +321,15 @@ estParams = function(new_matrix, round, MarketObject) {
     }
     
     else if (MarketObject$runType == 7) {
-        # WORKING ON THIS CURRENLTY
-        # IGNORE FOR NOW
-        x_y = as.data.frame(cbind(Y, MATRIX))
-        print(x_y)
-        regression = lm(formula = Y ~ ., data = x_y)
-        print(regression)
-        break
-        # Retrieving regression coefficients
-        test_val = (as.matrix(summary(regression)$coefficients[,1],
-                              nrow = MarketObject$size,
-                              ncol = 1))
-        return (smooth.spline())
-        return (test_val)
+      # CV glmnet lasso
+      # probably not correct yet
+      return (coef(cv.glmnet(x = MATRIX[,2:ncol(MATRIX)],
+                             y = Y,
+                             alpha = 0.95,
+                             nfolds = 10,   # might need to be more dynamic
+                             family = "gaussian"),
+                   # s = "lambda.min" chooses the lambda with the best cv value
+                   s = "lambda.min"))
     } else if (MarketObject$runType == 8) {
         
         x_y = as.data.frame(cbind(Y, MATRIX))
@@ -368,7 +364,14 @@ estParams = function(new_matrix, round, MarketObject) {
                        constant.weights = NULL, likelihood = FALSE)
         return(nn)
     } else if (MarketObject$runType == 10){
-      
+      start = length(MarketObject$xx) - MarketObject$memory
+      labels = MarketObject$xx[(start + MarketObject$size):length(MarketObject$xx)]
+      dataMatrix = matrix(ncol = MarketObject$size)
+      for(i in (start:(length(MarketObject$xx) - MarketObject$size))) {
+        dataMatrix = rbind(dataMatrix, MarketObject$xx[i:(i + MarketObject$size)])
+      }
+      dataMatrix = dataMatrix[-1,]
+      return(list(dataMatrix, labels))
     }
   
 }

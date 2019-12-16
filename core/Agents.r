@@ -27,6 +27,13 @@ setRefClass("OptimalAgent",
                         return(prediction(predictors, df))
                       }
                     } else if (runType == 10) {
+                      if (is.null(predictors)) {
+                        return(10.5)
+                      } else {
+                        library("FNN")
+                        knn = knn.reg(train = predictors[[1]], test = MarketObject$xx[(length(MarketObject$xx) - MarketObject$size + 1):length(MarketObject$xx)], y = predictors[[2]], k = 30)
+                        return(knn$pred)
+                      }
                        
                     } else if (runType == 8) {
                        
