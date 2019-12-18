@@ -28,5 +28,5 @@ risk_constant 0
 risk_type 0
 pshock 0.8
 
-runType 9
+runType 0
 selection_type 2

@@ -26,7 +26,7 @@ checkPath()
 source("core/Functions.r")
 source("core/Agents.r")
 source("core/Market.r")
-source("core/main-lm-v1.2.r")
+source("core/main.r")
 
 # Make sure input file was input
 if (length(args)==0) {
@@ -187,6 +187,11 @@ for(marketGroup in Market_Runs){
 
 print(agg_matrix)
 print(Sys.time() - startTime)
+# Used to print colored matrix
+#library('plot.matrix')
+#rownames(agg_matrix) <- c("10", "20", "30", "40", "50", "60", "70", "80", "90", "100")
+#colnames(agg_matrix) <- c("0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9")
+#plot(agg_matrix, digits=4, key=NULL, xlab="Pupdate", ylab="Memory", fmt.cell='%.3f', text.cell=list(cex=1), col = c("#00AA00", "#00CC00", "#9ACD32", "#7CFC00", "#FFFF80FF", "#FFFF2AFF", "#FFBF00FF", "#FF6000FF", "#FF6347", "#FF0000FF"), breaks=range(x))
 # Tell all slaves to close down, and exit the program
 mpi.close.Rslaves(dellog = FALSE)
 mpi.quit()

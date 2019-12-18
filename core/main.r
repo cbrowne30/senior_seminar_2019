@@ -4,10 +4,6 @@
 # a simulation 
 # Functions:
 #   1. main
-#   2. mainTwo
-#   3. initializer
-#   4. create_initial_data
-#   5. simulation_loop
 # ToDo:
 ##############################################
 
@@ -41,10 +37,8 @@
 # -1 fail
 
 main = function(MarketObject) {
-  # Then override the global input that we have from GetMacros with the parameter value
-  #seeder = sample(1:10, 1)
   set.seed(MarketObject$randSeed)
-  #set.seed(seeder)
+
   for (round in (MarketObject$lags + 1):MarketObject$numRounds) {
     if (round == (MarketObject$lags + 1)) {
       MarketObject$init()
@@ -71,7 +65,6 @@ main = function(MarketObject) {
     #MarketObject$print(verbose=TRUE, round)
   }
   
-  #Make_Zoos(round)
   #print("End of Sim")
   return (c(0, 0, MarketObject$memory, MarketObject$pUpDate, MarketObject$thresholdTally, MarketObject$randSeed))
 }

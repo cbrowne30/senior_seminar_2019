@@ -26,7 +26,7 @@ checkPath()
 source("core/Functions.r")
 source("core/Agents.r")
 source("core/Market.r")
-source("core/main-lm-v1.2.r")
+source("core/main.r")
 
 dependencyCheck(onHPC = FALSE)
 

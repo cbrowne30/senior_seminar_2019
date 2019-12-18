@@ -1,12 +1,16 @@
-# Plotting Sim Results
+##############################################
+# Document: Functions.r
+# Purpose: Used for plotting a simulation - must
+# be able to pass in a MarketObject
+# Functions:
+#   1. multiPlot
+# ToDo:
+##############################################
+
 library(ggplot2)
 library(zoo)
 library(reshape2)
 
-print(class(XX))
-print(class(Prices))
-print(class(Dividends))
-print(class(Interest))
 
 # Multiple plot function
 # This is from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
@@ -55,62 +59,46 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
+marketObject <<- readRDS("testMarket")
 
+Price_Div = data.frame(array(merge(zoo(1:length(marketObject$xx)),
+                                   as.numeric(marketObject$xx)),
+                             dim = c(length(marketObject$xx), 2)))
+price_div_graph = ggplot(Price_Div, aes(X1, X2)) + geom_line(aes(y=X2)) + labs(x = "Time", y = "Price + Dividend")
 
+PRICES = data.frame(array(merge(zoo(1:length(marketObject$prices)),
+                                as.numeric(marketObject$prices)),
+                          dim = c(length(marketObject$prices), 2)))
 
+price_graph = ggplot(PRICES, aes(X1, X2)) + geom_line(aes(y = X2)) + labs(x = "Time", y = "Price")
 
-div = data.frame(array(merge(zoo(1:length(Dividends)),
-                             as.numeric(Dividends)),
-                       dim = c(length(Dividends), 2)))
+div = data.frame(array(merge(zoo(1:length(marketObject$dividends)), as.numeric(marketObject$dividends)), dim = c(length(marketObject$dividends), 2)))
 
-div_graph <- ggplot(div, aes(X1, X2)) +
-  geom_line(aes(y=X2)) +
-  labs(x = "Time", y = "Dividend")
+div_graph = ggplot(div, aes(X1, X2)) + geom_line(aes(y=X2)) + labs(x = "Time", y = "Dividend")
 
-interests = data.frame(array(merge(zoo(1:length(Interest)),
-                                    as.numeric(Interest)),
-                              dim = c(length(Interest), 2)))
+interests = data.frame(array(merge(zoo(1:length(marketObject$interestRates)), as.numeric(marketObject$interestRates)), dim = c(length(marketObject$interestRates), 2)))
 
-interest_graph <- ggplot(interests, aes(X1, X2)) +
-  geom_line(aes(y=X2)) +
-  labs(x = "Time", y = "Interest")
+interest_graph = ggplot(interests, aes(X1, X2)) + geom_line(aes(y=X2)) + labs(x = "Time", y = "Interest")
 
 # plot all fundementals together
 multiplot(price_div_graph, price_graph, div_graph, interest_graph, cols=2)
 
-Time = array(1:length(XX),
-             dim=c(rounds, 1),
-             list(1:rounds, c("Time")))
 
-alphaMatrix <<- array(AlphaMatrix[(rounds+1):length(AlphaMatrix)],
-                      dim = c(rounds, size - 1),
-                      dimnames = list(1:rounds, 1:(size - 1)))
+Time = array(1:length(marketObject$xx),
+             dim=c(marketObject$numRounds, 1),
+             list(1:marketObject$numRounds, c("Time")))
+
+alphaMatrix = array(marketObject$alphaMatrix[(marketObject$numRounds+1):length(marketObject$alphaMatrix)],
+                    dim = c(marketObject$numRounds, marketObject$size - 1),
+                    dimnames = list(1:marketObject$numRounds, 1:(marketObject$size - 1)))
 
 df = melt(data.frame(merge(zoo(Time),
                            zoo(alphaMatrix))),
           id.vars="Time")
 
-ggplot(df, aes(x=Time, y=value, group=variable, color=variable)) +
-  geom_line() +
-  labs(x="Time", y="Coefficient Value")
+ggplot(df, aes(x=Time, y=value, group=variable, color=variable)) + geom_line() + labs(x="Time", y="Coefficient Value")
 
 
-plotMain = function(marketObject) {
-  Price_Div = data.frame(array(merge(zoo(1:length(marketObject$xx)),
-                                     as.numeric(marketObject$xx)),
-                               dim = c(length(marketObject$xx), 2)))
-  price_div_graph <- ggplot(Price_Div, aes(X1, X2)) +
-    geom_line(aes(y=X2)) +
-    labs(x = "Time", y = "Price + Dividend")
-  
-  PRICES = data.frame(array(merge(zoo(1:length(marketObject$prices)),
-                                  as.numeric(marketObject$prices)),
-                            dim = c(length(marketObject$prices), 2)))
-  
-  price_graph <- ggplot(PRICES, aes(X1, X2)) +
-    geom_line(aes(y = X2)) + 
-    labs(x = "Time", y = "Price")
-}
 
 # Put some Zoo Objs. Together
 # Fundamentals = merge(XX, Prices, Dividends, Interest) #changed EX to XX 7/17/17

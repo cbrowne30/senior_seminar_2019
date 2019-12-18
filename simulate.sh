@@ -46,7 +46,7 @@ unitTests() {
   echo "Running Unit Tests"
 }
 
-
+git status -uno
 if [ $1 = "montecarlo" ]; then
   monteCarlo $2 $3 $4
 elif [ $1 = "unittests" ]; then

@@ -8,8 +8,12 @@
 #   3. marketPrice
 #   4. MSFE
 #   5. hetero_MSFE
-#   6. marketParams
+#   6. calculateRepAgent
 #   7. estParams
+#   8. prediction
+#   9. dependdencyCheck
+#   10. GetMacros
+#   11. printSomething
 # ToDo:
 ##############################################
 
