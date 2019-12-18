@@ -21,12 +21,12 @@ bubbleThresholdLow 0.0
 noiserange 0
 interest 0.05
 dividend 0.5
-shockRangeDiv 0.5 
+shockRangeDiv 0.5
 
 
 risk_constant 0
 risk_type 0
 pshock 0.8
 
-runType 0
+runType 9
 selection_type 2

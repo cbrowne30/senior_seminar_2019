@@ -6,7 +6,7 @@
 # ToDo:
 ##############################################
 #!/usr/bin/env Rscript
-
+print
 checkPath = function() {
   path = getwd()
   if (substr(path,(nchar(path) + 1) - 19, nchar(path)) != "senior_seminar_2019") {
@@ -32,20 +32,21 @@ source("core/main-lm-v1.2.r")
 if (length(args)==0) {
   stop("Input File must be given", call.=FALSE)
 }
-
+x = list("market")
+print(x)
 args <- commandArgs(trailingOnly = TRUE)
 sink(paste(args[2], "/", args[3], sep = ""), append=FALSE, split=FALSE)
 
 dependencyCheck(onHPC = TRUE)
 
 startTime = Sys.time()
-mem_list = seq(100, 100, 10)
-pupdate_list = seq(0.1, 0.1, 0.1)
-num_sims = 10
+mem_list = seq(10, 40, 10)
+pupdate_list = seq(0.1, 0.4, 0.1)
+num_sims = 500
 Market_List = list()
 #set.seed(3)
 
-GetMacros(paste("inputs/", args[1], sep = ""))
+GetMacros(paste(args[2],"/", args[1], sep = ""))
 # args = commandArgs(trailingOnly=TRUE)
 # if (length(args)==0) {
 #   stop("At least one argument must be supplied - the input file", call.=FALSE)
@@ -112,7 +113,6 @@ if (!is.loaded("mpi_initialize")) {
   library("Rmpi")
 }
 
-
 ns <- mpi.universe.size() - 1
 mpi.spawn.Rslaves(nslaves=ns)
 #
@@ -150,10 +150,14 @@ agg_matrix = matrix(nrow = length(mem_list), ncol = length(pupdate_list), dimnam
 numMarket = 1
 
 for(marketGroup in Market_Runs){
+  print("Before")
+  print(Sys.time() - startTime) 
   returns <- mpi.applyLB(marketGroup, main)
   
   #Progress prints to output file
   print(paste0("Finished ", numMarket, " of ", length(Market_Runs), " market types"))
+  print("During")
+  print(Sys.time() - startTime)
   numMarket = numMarket + 1
   print(returns)
   
@@ -176,6 +180,9 @@ for(marketGroup in Market_Runs){
   } else{
     col = col+1
   }
+  print("AFter")
+  print(Sys.time() - startTime)
+  print(marketGroup[1])
 }
 
 print(agg_matrix)
@@ -183,3 +190,7 @@ print(Sys.time() - startTime)
 # Tell all slaves to close down, and exit the program
 mpi.close.Rslaves(dellog = FALSE)
 mpi.quit()
+mdat <- matrix(c(1,2,3, 7,8,9), nrow = 2, ncol=3, byrow=TRUE,
+               dimnames = list(c("R.1", "R.2"), c("C.1", "C.2", "C.3")))
+apply(mdat, 1,mean)
+print(mdat)

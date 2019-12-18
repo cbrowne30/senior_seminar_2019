@@ -35,8 +35,20 @@ setRefClass("OptimalAgent",
                         return(knn$pred)
                       }
                        
-                    } else if (runType == 8) {
-                       
+                    } else if (runType == 11) {
+                      if (is.null(predictors)) {
+                        return(10.5)
+                      } else {
+                        numberPredictors = 3
+                        df = data.frame(1)
+                        
+                        for (i in (numberPredictors - 1):0) {
+                          df[paste("p", toString(i), sep = "")] = MarketObject$xx[[length(MarketObject$xx) - i]]
+                        }
+                        df = subset(df, select = -c(X1))
+                        
+                        return(prediction(predictors, df))
+                      }
                     } else {
                        
                     }

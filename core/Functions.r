@@ -372,8 +372,28 @@ estParams = function(new_matrix, round, MarketObject) {
       }
       dataMatrix = dataMatrix[-1,]
       return(list(dataMatrix, labels))
+    } else if (MarketObject$runType == 11){
+        #Start of Random forest. Needs to be made time aware
+        # x_y = as.data.frame(cbind(Y, MATRIX))
+        # regression = randomForest(Y ~ ., data = x_y, proximity = TRUE)
+        # return(regression)
+        set.seed(42)
+        numberPredictors = 3
+        df = data.frame(seq(1, MarketObject$memory - numberPredictors, 1))
+        
+        for (predictor in 1:numberPredictors) {
+          df[paste("p", toString(predictor), sep="")] = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + predictor) : (length(MarketObject$xx) - numberPredictors + predictor - 1)]
+        }
+        # print (df$p2)
+        
+        # print(x)
+        # 
+        # df$p2
+        
+        model <- randomForest(p2 ~ p1 , data = df, proximity=TRUE)
+        
+        return (model)
     }
-  
 }
 
 prediction = function(nn, df) {
@@ -382,7 +402,7 @@ prediction = function(nn, df) {
     }, warning = function(war) {
         print("Warning")
     }, error = function(err) {
-        print("ERORR FUCKING ERROR")
+        print("Error")
         print(err)
     })
     return(result)
@@ -398,8 +418,8 @@ dependencyCheck = function(onHPC) {
         library(rlist)
         library(dplyr)
         library(leaps)
-        #library(neuralnet)
-        #library(randomForest)
+        library(neuralnet)
+        library(randomForest)
     } else {
         dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest")
         for (depen in dependencies) {

@@ -42,7 +42,9 @@
 
 main = function(MarketObject) {
   # Then override the global input that we have from GetMacros with the parameter value
+  #seeder = sample(1:10, 1)
   set.seed(MarketObject$randSeed)
+  #set.seed(seeder)
   for (round in (MarketObject$lags + 1):MarketObject$numRounds) {
     if (round == (MarketObject$lags + 1)) {
       MarketObject$init()
