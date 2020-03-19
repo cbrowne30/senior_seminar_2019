@@ -28,7 +28,7 @@ source("core/Agents.r")
 source("core/Market.r")
 source("core/main.r")
 
-dependencyCheck(onHPC = FALSE)
+dependencyCheck(onHPC = TRUE)
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {

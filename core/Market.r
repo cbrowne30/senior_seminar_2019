@@ -135,6 +135,7 @@ setRefClass("Market",
                     printSomething(round)
                 },
                 simulation = function(round) {
+                    printSomething(round)
                     if (round < memory) {
                         stop("t is less than memory. This should not be possible")
                     } else {
@@ -191,7 +192,8 @@ setRefClass("Market",
                         for (trader in tradersToUpdate) {
                           agents[[trader]]$changeOptimalAgent(newOA)
                         }
-                        newPrice = calculateRepAgent(MarketObject = .self)
+                        newPriceDividend = calculateRepAgent(MarketObject = .self)
+                        newPrice = newPriceDividend / (1 + interest)
                         updateFundamentals(newPrice = newPrice, round = round)
                       }
                     }

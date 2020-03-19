@@ -166,10 +166,29 @@ calculateRepAgent = function(MarketObject) {
         return(mean_params)
     } else {
         totalPrice = 0
+        totalConnections = 0
         lastPrice = MarketObject$xx[[length(MarketObject$xx)]]
+        count = 1
         for (optimalAgent in MarketObject$optimalAgents) {
-            totalPrice = totalPrice + (optimalAgent$predict(MarketObject = MarketObject) * optimalAgent$connections)
+            if (optimalAgent$connections == 0) {
+              MarketObject$optimalAgents = list.remove(MarketObject$optimalAgents, count)
+            } else {
+              prediction = optimalAgent$predict(MarketObject = MarketObject)
+              totalPrice = totalPrice + (prediction * optimalAgent$connections)
+              totalConnections = optimalAgent$connections + totalConnections
+              print(prediction)
+              print(optimalAgent$connections)
+              print(prediction * optimalAgent$connections)
+              print(count)
+              print("#########")
+              count = count + 1
+            }
         }
+        print(totalPrice / MarketObject$numAgents)
+        print(totalConnections)
+        print("===================")
+        #cat ("Press [enter] to continue")
+        #invisible(scan("stdin", character(), nlines = 1, quiet = TRUE))
         return(totalPrice / MarketObject$numAgents)
     }
 }
@@ -355,6 +374,8 @@ estParams = function(new_matrix, round, MarketObject) {
         for (predictor in 1:numberPredictors) {
             df[paste("p", toString(predictor), sep="")] = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + predictor) : (length(MarketObject$xx) - numberPredictors + predictor - 1)]
         }
+        print(df)
+        stop()
         formula = as.formula(paste("label ~ p", paste(seq(1,numberPredictors, 1), collapse = " + p"), sep=""))
         label = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + predictor + 1) : (length(MarketObject$xx))]
         df['label'] = label
@@ -368,14 +389,9 @@ estParams = function(new_matrix, round, MarketObject) {
                        constant.weights = NULL, likelihood = FALSE)
         return(nn)
     } else if (MarketObject$runType == 10){
-      start = length(MarketObject$xx) - MarketObject$memory
-      labels = MarketObject$xx[(start + MarketObject$size):length(MarketObject$xx)]
-      dataMatrix = matrix(ncol = MarketObject$size)
-      for(i in (start:(length(MarketObject$xx) - MarketObject$size))) {
-        dataMatrix = rbind(dataMatrix, MarketObject$xx[i:(i + MarketObject$size)])
-      }
-      dataMatrix = dataMatrix[-1,]
-      return(list(dataMatrix, labels))
+      trainX = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory):(length(MarketObject$xx) - 1)]
+      trainY = MarketObject$xx[(length(MarketObject$xx) - MarketObject$memory + 1):length(MarketObject$xx)]
+      return(list(trainX, trainY))
     } else if (MarketObject$runType == 11){
         #Start of Random forest. Needs to be made time aware
         # x_y = as.data.frame(cbind(Y, MATRIX))
@@ -400,6 +416,7 @@ estParams = function(new_matrix, round, MarketObject) {
     }
 }
 
+
 prediction = function(nn, df) {
     result = tryCatch({
         return(predict(nn, df)[[1]])
@@ -422,8 +439,9 @@ dependencyCheck = function(onHPC) {
         library(rlist)
         library(dplyr)
         library(leaps)
-        library(neuralnet)
-        library(randomForest)
+        library(FNN)
+        #library(neuralnet)
+        #library(randomForest)
     } else {
         dependencies = c("zoo", "xts", "glmnet", "rlist", "dplyr", "leaps", "neuralnet", "randomForest")
         for (depen in dependencies) {
@@ -487,4 +505,14 @@ printSomething = function(x) {
     print(x)
 }
 
+
+# x = list(1,2,3,4)
+# for (y in x) {
+#   if (y == 2) {
+#     x = list.remove(x, 2)
+#   } else {
+#     print(y)
+#   }
+# }
+# print(x)
 

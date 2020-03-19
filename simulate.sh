@@ -2,8 +2,6 @@
 # The script creates a new simulation directory and changes 
 # the files in it to correct paths/output file names and such.
 
-# TO RUN:
-# ./simulate.sh new_directory_name input_file_name output_file_name
 
 # I've made it so there is an input file directory containing any number
 # of input files.  This way you can run repeated experiments with the same input
@@ -32,7 +30,7 @@ monteCarlo() {
   NEW_DIRECTORY=$2
   OUTPUT_FILE=$3
   
-  echo "mpiexec -n 1 Rscript ./core/monteCarlo.r $INPUT_FILE $NEW_DIRECTORY $OUTPUT_FILE" >> $2/run.job
+  echo "mpiexec -n 1 Rscript ./$2/monteCarlo.r $INPUT_FILE $NEW_DIRECTORY $OUTPUT_FILE" >> $2/run.job
   qsub $2/run.job
   #sed -i '$d' core/run.job
 }

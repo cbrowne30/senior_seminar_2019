@@ -28,13 +28,20 @@ setRefClass("OptimalAgent",
                       }
                     } else if (runType == 10) {
                       if (is.null(predictors)) {
-                        return(10.5)
+                        print("YUP")
+                        return(10)
                       } else {
                         library("FNN")
-                        knn = knn.reg(train = predictors[[1]], test = MarketObject$xx[(length(MarketObject$xx) - MarketObject$size + 1):length(MarketObject$xx)], y = predictors[[2]], k = 30)
+                        #trainSet = matrix(ncol=3,nrow=0)
+                        #for (x in seq(1, length(predictors[[1]]), by=3)) {
+                        #  trainSet = rbind(trainSet, predictors[[1]][x:x+3])
+                        #}
+                        #printSomething(trainSet)
+                        #stop()
+                        knn = knn.reg(train = predictors[[1]], test = MarketObject$xx[length(MarketObject$xx):length(MarketObject$xx)], y = predictors[[2]],
+                                      k = 15, algorithm = "cover_tree")
                         return(knn$pred)
                       }
-                       
                     } else if (runType == 11) {
                       if (is.null(predictors)) {
                         return(10.5)
